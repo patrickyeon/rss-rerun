@@ -55,4 +55,8 @@ class Rerun
                                             e.at('origDate').content]}
     end
 
+    def to_xml
+        @feed.to_xml
+    end
+
 end
