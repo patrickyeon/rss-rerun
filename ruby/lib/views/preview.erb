@@ -1,0 +1,18 @@
+<html><head><title>Preview</title></head>
+<body>
+<p>
+Here is a preview for <%= feed_url %>.
+</p>
+
+<ul>
+    <% for @item in items %>
+        <li><%= @item[0] %></li>
+        <ul><li>Originally: <%= @item[2] %>, Rebroadcast: <%= @item[1] %></li></ul>
+    <% end %>
+</ul>
+
+<p>
+Looks good, don't in?
+</p>
+</body>
+</html>

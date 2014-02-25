@@ -48,4 +48,11 @@ class Rerun
             e.remove
         end
     end
+
+    def preview_feed
+        @feed.xpath('//item').collect {|e| [e.at('title').content,
+                                            e.at('pubDate').content,
+                                            e.at('origDate').content]}
+    end
+
 end
