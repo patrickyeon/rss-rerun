@@ -1,21 +1,14 @@
 #!/usr/bin/env ruby
-require 'feedzirra'
-
-# TODO how to do this for all Parsers, preferrably without iterating by hand
-class Feedzirra::Parser::ITunesRSSItem
-    attr_accessor :original_published
-
-    def override_published(val)
-        @published = val
-    end
-end
+require 'nokogiri'
+require 'open-uri'
 
 class Rerun
     
     def initialize(url, startTime = nil, schedule = '0123456')
         @url = url
-        @feed = Feedzirra::Feed.fetch_and_parse(url)
+        @feed = Nokogiri::XML(open(url))
         # TODO fail out if fetch fails
+		#      figure out why this doesn't work as expected
         startTime = startTime or DateTime.now
         @startTime = DateTime.new(startTime.year, startTime.month, startTime.day)
         @schedule = schedule
@@ -29,14 +22,24 @@ class Rerun
         oneday = 1 #24 * 60 * 60
         repubDate = @startTime
         count = 0
-        entries = @feed.entries.reverse
+        entries = @feed.xpath('//item').reverse
 
         # TODO this needs a lot more logic to work around what happens as we
         #        catch up with the original feed.
         while (repubDate < DateTime.now) and (count < entries.length) do
             if @schedule.include?(repubDate.wday.to_s)
-                entries.at(count).original_published = entries.at(count).published
-                entries.at(count).override_published(repubDate.rfc822)
+				entry = entries.at(count)
+				# TODO origDate needs a namespace
+				#      add to the description by treating it as xml
+				#      make the changes only once, no matter how often called
+				odate = Nokogiri::XML::Node.new 'origDate', @feed
+				odate.content = entry.at('pubDate').to_str
+				entry.at('pubDate').add_next_sibling odate
+				entry.at('pubDate').content = repubDate
+
+				# add a "originally published on" date to the description
+				datestr = "\n<p> Originally published on " << odate.content << '</p>'
+				entry.at('description').content = entry.at('description').content + datestr
                 count += 1
             end
             repubDate = repubDate + oneday
