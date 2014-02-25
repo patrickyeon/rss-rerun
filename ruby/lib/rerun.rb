@@ -14,12 +14,12 @@ class Rerun
         @schedule = schedule
     end
 
-    def entries_shifted
+    def shift_entries
         if DateTime.now < @startTime
             return []
         end
 
-        oneday = 1 #24 * 60 * 60
+        oneDay = 1
         repubDate = @startTime
         count = 0
         entries = @feed.xpath('//item').reverse
@@ -30,7 +30,6 @@ class Rerun
             if @schedule.include?(repubDate.wday.to_s)
 				entry = entries.at(count)
 				# TODO origDate needs a namespace
-				#      add to the description by treating it as xml
 				#      make the changes only once, no matter how often called
 				odate = Nokogiri::XML::Node.new 'origDate', @feed
 				odate.content = entry.at('pubDate').to_str
@@ -42,9 +41,11 @@ class Rerun
 				entry.at('description').content = entry.at('description').content + datestr
                 count += 1
             end
-            repubDate = repubDate + oneday
+            repubDate = repubDate + oneDay
         end
 
-        return entries[0,count].reverse
+        entries[count .. -1].each do |e|
+            e.remove
+        end
     end
 end
