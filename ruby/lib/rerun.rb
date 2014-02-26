@@ -8,8 +8,7 @@ class Rerun
         @url = url
         @feed = Nokogiri::XML(open(url))
         # TODO fail out if fetch fails
-		#      figure out why this doesn't work as expected
-        startTime = startTime or DateTime.now
+        startTime = startTime || DateTime.now
         @startTime = DateTime.new(startTime.year, startTime.month, startTime.day)
         @schedule = schedule
     end
