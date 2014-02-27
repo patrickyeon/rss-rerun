@@ -1,0 +1,28 @@
+For 0.1
+=======
+- pass through startDate, schedule
+|- startDate picker
+|- schedule picker
+- proper handle on caught-up feeds
+- origDate namespace
+- error check on fetch
+- better copy
+- prevent abuse
+|- rate limit fetching
+|- input sanitization
+|- path traversal
+|- scan Sinatra security info
+
+0.2
+===
+- explore bundle creation
+- caching
+- buttload of tests
+- check various formats (RSS 0.9, 2.0, atom, itunes)
+|- mal-formed feeds
+
+0.3
+===
+- archiving
+- style check
+- user-selected update time
