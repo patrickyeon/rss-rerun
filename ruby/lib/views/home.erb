@@ -1,0 +1,34 @@
+<html><head><title>RSS Rebroadcaster</title></head>
+<body>
+<p>Wouldn't it be nice to start that podcast you just discovered from the beginning, but
+also be able to catch up with it so that you can listen in realtime? Or maybe just go through
+a load of old content at your own pace? Now you can!</p>
+
+<p>Check out my new RSS rebroadcasting service! Just put in a feed URL, a date to start from,
+and a rerun schedule, and wha-bam! I'll give you a whole new feed so that you can consume that
+content on your own terms!</p>
+
+<p>Why not try now, I've lined up some examples. You can also jump right in and cue up a
+feed I've never heard of.</p>
+
+<a href="rerun?url=http%3A%2F%2Fembedded.fm%2Fepisodes%3Fformat%3Drss&startDate=<%= DateTime.now - 7 %>&schedule=246">Making Embedded Systems</a>, 
+originally a weekly podcast but you can catch up with episodes on a Monday-Wednesday-Friday
+schedule until you've burnt through the backlog. Better get started, the reruns started
+a week ago!
+
+<br/>
+<br/>
+<br/>
+
+<form action="/preview" method="GET">
+	Your own feed of choice: <input type="text" name="url">
+	<br/>
+	<strike>Start date of the rerun</strike>
+	<br/>
+	<strike>Schedule to re-broadcast on</strike>
+	<br/>
+	<input type="submit">
+</form>
+
+</body>
+</html>
