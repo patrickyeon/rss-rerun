@@ -1,8 +1,8 @@
 For 0.1
 =======
-- pass through startDate, schedule
-|- startDate picker
-|- schedule picker
+- startDate picker
+|- pake sure date parsing is "good enough"
+- schedule picker
 - proper handle on caught-up feeds
 - origDate namespace
 - error check on fetch
