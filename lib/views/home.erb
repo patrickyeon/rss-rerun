@@ -21,11 +21,20 @@ a week ago!
 <br/>
 
 <form action="/preview" method="GET">
-	Your own feed of choice: <input type="text" name="url">
+	Your own feed of choice:
+	<input type="text" name="url" value="http://embedded.fm/episodes?format=rss">
 	<br/>
 	<strike>Start date of the rerun</strike>
+	<input type="hidden" name="startDate" value="<%= (DateTime.now - 9).rfc822 %>"/>
 	<br/>
-	<strike>Schedule to re-broadcast on</strike>
+	Schedule to re-broadcast on:<br/>
+	<input type="checkbox" name="sun" value="true" checked/>Sunday<br/>
+	<input type="checkbox" name="mon" value="true"/>Monday<br/>
+	<input type="checkbox" name="tue" value="true"/>Tuesday<br/>
+	<input type="checkbox" name="wed" value="true"/>Wednesday<br/>
+	<input type="checkbox" name="thu" value="true" checked/>Thursday<br/>
+	<input type="checkbox" name="fri" value="true" checked/>Friday<br/>
+	<input type="checkbox" name="sat" value="true"/>Saturday<br/>
 	<br/>
 	<input type="submit">
 </form>
