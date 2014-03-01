@@ -18,6 +18,12 @@ class Rerun
             return []
         end
 
+        # make sure we have our namespace here
+        unless @feed.root.namespaces.key('xmlns:rerun')
+            # TODO find a real URL for the namespace to point to
+            @feed.root.add_namespace_definition('rerun', 'todo://put.in/a/URL.here')
+        end
+
         oneDay = 1
         repubDate = @startTime
         count = 0
@@ -28,9 +34,9 @@ class Rerun
         while (repubDate < DateTime.now) and (count < entries.length) do
             if @schedule.include?(repubDate.wday.to_s)
 				entry = entries.at(count)
-				# TODO origDate needs a namespace
+				# TODO is this the proper way to use a namespace?
 				#      make the changes only once, no matter how often called
-				odate = Nokogiri::XML::Node.new 'origDate', @feed
+				odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed
 				odate.content = entry.at('pubDate').to_str
 				entry.at('pubDate').add_next_sibling odate
 				entry.at('pubDate').content = repubDate
@@ -51,7 +57,7 @@ class Rerun
     def preview_feed
         @feed.xpath('//item').collect {|e| [e.at('title').content,
                                             e.at('pubDate').content,
-                                            e.at('origDate').content]}
+                                            e.at_xpath('rerun:origDate').content]}
     end
 
     def to_xml
