@@ -21,7 +21,8 @@ class Rerun
         # make sure we have our namespace here
         unless @feed.root.namespaces.key('xmlns:rerun')
             # TODO find a real URL for the namespace to point to
-            @feed.root.add_namespace_definition('rerun', 'todo://put.in/a/URL.here')
+            @feed.root.add_namespace_definition('rerun',
+                                                'https://github.com/patrickyeon/rerun-rss')
         end
 
         oneDay = 1

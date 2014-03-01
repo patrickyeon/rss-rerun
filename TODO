@@ -5,8 +5,6 @@ For 0.1
 - schedule picker
 |- current thing looks good, but want an all/none box
 - proper handle on caught-up feeds
-- origDate namespace
-|- just need to make sure this is done legitimately
 - make shift_entries not modify things more than once
 - error check on fetch
 - better copy
