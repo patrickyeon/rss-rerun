@@ -1,4 +1,17 @@
-<html><head><title>RSS Rebroadcaster</title></head>
+<html><head><title>RSS Rebroadcaster</title>
+
+<script type="text/javascript">
+	function checkAll(check) {
+		var form = document.getElementById("scheduleForm");
+		for (i = 0, n = form.elements.length; i < n; i++)
+			if (form.elements[i].className.indexOf('day') != -1) {
+				form.elements[i].checked = check;
+			}
+	}
+</script>
+
+</head>
+
 <body>
 <p>Wouldn't it be nice to start that podcast you just discovered from the beginning, but
 also be able to catch up with it so that you can listen in realtime? Or maybe just go through
@@ -20,7 +33,7 @@ a week ago!
 <br/>
 <br/>
 
-<form action="/preview" method="GET">
+<form action="/preview" method="GET" id="scheduleForm">
 	Your own feed of choice:
 	<input type="text" name="url" value="http://embedded.fm/episodes?format=rss">
 	<br/>
@@ -28,13 +41,14 @@ a week ago!
 	<input type="hidden" name="startDate" value="<%= (DateTime.now - 9).rfc822 %>"/>
 	<br/>
 	Schedule to re-broadcast on:<br/>
-	<input type="checkbox" name="sun" value="" checked/>Sunday<br/>
-	<input type="checkbox" name="mon" value=""/>Monday<br/>
-	<input type="checkbox" name="tue" value=""/>Tuesday<br/>
-	<input type="checkbox" name="wed" value=""/>Wednesday<br/>
-	<input type="checkbox" name="thu" value="" checked/>Thursday<br/>
-	<input type="checkbox" name="fri" value="" checked/>Friday<br/>
-	<input type="checkbox" name="sat" value=""/>Saturday<br/>
+	<input type="checkbox" onclick="checkAll(this.checked)"/>Select/Clear all<br/>
+	<input type="checkbox" name="sun" class="day" value="" checked/>Sunday<br/>
+	<input type="checkbox" name="mon" class="day" value=""/>Monday<br/>
+	<input type="checkbox" name="tue" class="day" value=""/>Tuesday<br/>
+	<input type="checkbox" name="wed" class="day" value=""/>Wednesday<br/>
+	<input type="checkbox" name="thu" class="day" value="" checked/>Thursday<br/>
+	<input type="checkbox" name="fri" class="day" value="" checked/>Friday<br/>
+	<input type="checkbox" name="sat" class="day" value=""/>Saturday<br/>
 	<br/>
 	<input type="submit">
 </form>
