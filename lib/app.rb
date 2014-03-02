@@ -21,20 +21,21 @@ get '/preview' do
             backdate = 0
         end
     rescue
-        # no-op, backdate is already 0
+        backdate = 0
     end
 
     schedule = sched_from(params)
-    feed = Rerun.new(params[:url],
-                     DateTime.now - backdate,
-                     schedule)
+
+    feedurl = safe_url(params[:url])
+
+    feed = Rerun.new(feedurl, DateTime.now - backdate, schedule)
     feed.shift_entries
 
-    rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(params[:url])
+    rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(feedurl)
     rss_url += '&startDate=' + (DateTime.now - backdate).strftime('%F')
     schedule.chars {|c| rss_url += '&' + Weekdays[c.to_i]}
     erb :preview, :locals => {:items => feed.preview_feed,
-                              :feed_url => params[:url],
+                              :feed_url => feedurl,
                               :rerun_url => rss_url}
 end
 
@@ -46,7 +47,7 @@ get '/rerun' do
         startDate = DateTime.now
     end
 
-    feed = Rerun.new(params[:url], startDate, sched_from(params))
+    feed = Rerun.new(safe_url(params[:url]), startDate, sched_from(params))
     feed.shift_entries
     return feed.to_xml
 end
@@ -59,4 +60,17 @@ def sched_from(params)
         end
     end
     return retstr
+end
+
+def safe_url(url)
+    # this seems to be a little heavy-handed, but I think it'll prevent the
+    #   worst trouble from eg. directory traversal.
+    returl = ''
+    if [URI::HTTP, URI::HTTPS].include? URI.parse(url).class
+        returl = url
+    else
+        returl = 'http://' + url
+    end
+
+    return returl
 end

@@ -6,9 +6,6 @@ For 0.1
 - better copy
 - prevent abuse
 |- rate limit fetching
-|- input sanitization
-|- path traversal
-|- scan Sinatra security info
 - make sure gemfile makes sense
 |- version number gets tracked somewhere?
 
