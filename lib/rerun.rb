@@ -11,11 +11,16 @@ class Rerun
         startTime = startTime || DateTime.now
         @startTime = DateTime.new(startTime.year, startTime.month, startTime.day)
         @schedule = schedule
+        shift_entries
     end
 
     def shift_entries
+        # TODO make sure this only happens once. For now, it's just a private
+        #        method and we call it during initialization
+
         if DateTime.now < @startTime
-            return []
+            @feed.xpath('//item').each {|e| e.remove}
+            return
         end
 
         # make sure we have our namespace here
@@ -36,7 +41,6 @@ class Rerun
             if @schedule.include?(repubDate.wday.to_s)
 				entry = entries.at(count)
 				# TODO is this the proper way to use a namespace?
-				#      make the changes only once, no matter how often called
 				odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed
 				odate.content = entry.at('pubDate').to_str
 				entry.at('pubDate').add_next_sibling odate
@@ -65,4 +69,5 @@ class Rerun
         @feed.to_xml
     end
 
+    private :shift_entries
 end

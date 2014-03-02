@@ -29,7 +29,6 @@ get '/preview' do
     feedurl = safe_url(params[:url])
 
     feed = Rerun.new(feedurl, DateTime.now - backdate, schedule)
-    feed.shift_entries
 
     rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(feedurl)
     rss_url += '&startDate=' + (DateTime.now - backdate).strftime('%F')
@@ -48,7 +47,6 @@ get '/rerun' do
     end
 
     feed = Rerun.new(safe_url(params[:url]), startDate, sched_from(params))
-    feed.shift_entries
     return feed.to_xml
 end
 

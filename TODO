@@ -1,7 +1,6 @@
 For 0.1
 =======
 - proper handle on caught-up feeds
-- make shift_entries not modify things more than once
 - error check on fetch
 - better copy
 - prevent abuse
