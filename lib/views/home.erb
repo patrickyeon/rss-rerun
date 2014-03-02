@@ -37,9 +37,16 @@ a week ago!
 	Your own feed of choice:
 	<input type="text" name="url" value="http://embedded.fm/episodes?format=rss">
 	<br/>
-	<strike>Start date of the rerun</strike>
-	<input type="hidden" name="startDate" value="<%= (DateTime.now - 9).rfc822 %>"/>
+
+	Start the reruns 
+	<select name="backdate">
+		<% for i in 0..28 %>
+			<option value="<%= i %>"><%= i %></option>
+		<% end %>
+	</select>
+	days ago.
 	<br/>
+
 	Schedule to re-broadcast on:<br/>
 	<input type="checkbox" onclick="checkAll(this.checked)"/>Select/Clear all<br/>
 	<input type="checkbox" name="sun" class="day" value="" checked/>Sunday<br/>
@@ -50,6 +57,7 @@ a week ago!
 	<input type="checkbox" name="fri" class="day" value="" checked/>Friday<br/>
 	<input type="checkbox" name="sat" class="day" value=""/>Saturday<br/>
 	<br/>
+
 	<input type="submit">
 </form>
 

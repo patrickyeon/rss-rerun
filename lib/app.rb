@@ -14,14 +14,24 @@ get '/preview' do
         redirect to('/'), 302
     end
 
+    backdate = 0
+    begin
+        backdate = Integer(params[:backdate])
+        unless 0 <= backdate and backdate <= 28
+            backdate = 0
+        end
+    rescue
+        # no-op, backdate is already 0
+    end
+
     schedule = sched_from(params)
     feed = Rerun.new(params[:url],
-                     DateTime.parse(params[:startDate]),
+                     DateTime.now - backdate,
                      schedule)
     feed.shift_entries
 
     rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(params[:url])
-    rss_url += '&startDate=' + (DateTime.now - 9).rfc822
+    rss_url += '&startDate=' + (DateTime.now - backdate).strftime('%F')
     schedule.chars {|c| rss_url += '&' + Weekdays[c.to_i]}
     erb :preview, :locals => {:items => feed.preview_feed,
                               :feed_url => params[:url],
@@ -29,11 +39,16 @@ get '/preview' do
 end
 
 get '/rerun' do
-    feed = Rerun.new(params[:url],
-                     DateTime.parse(params[:startDate]),
-                     sched_from(params))
+    startDate = nil
+    begin
+        startDate = DateTime.parse(params[:startDate])
+    rescue
+        startDate = DateTime.now
+    end
+
+    feed = Rerun.new(params[:url], startDate, sched_from(params))
     feed.shift_entries
-    feed.to_xml
+    return feed.to_xml
 end
 
 def sched_from(params)
@@ -43,5 +58,5 @@ def sched_from(params)
             retstr += String(i)
         end
     end
-    retstr
+    return retstr
 end
