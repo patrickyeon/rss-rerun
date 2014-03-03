@@ -1,7 +1,5 @@
 For 0.1
 =======
-- proper handle on caught-up feeds
-- error check on fetch
 - better copy
 - prevent abuse
 |- rate limit fetching
@@ -17,6 +15,7 @@ For 0.1
 |- my own CI bot
 - check various formats (RSS 0.9, 2.0, atom, itunes)
 |- mal-formed feeds
+- proper handle on caught-up feeds
 
 0.3
 ===

@@ -1,0 +1,12 @@
+<html><head><title>Whoops!</title></head>
+
+<body>
+Oh dear, looks like something broke. Here's what I can tell you:<br/>
+<% if exception != nil %>
+    <p><%= exception.message %></p>
+<% else %>
+    <p>No error passed in.</p>
+<% end %>
+
+<p>I was trying to access <u><%= url %></u>.</p>
+</body></html>

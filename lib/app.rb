@@ -5,6 +5,10 @@ require 'cgi'
 
 Weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 
+configure do
+    disable :show_exceptions
+end
+
 get '/' do
     erb :home
 end
@@ -48,6 +52,16 @@ get '/rerun' do
 
     feed = Rerun.new(safe_url(params[:url]), startDate, sched_from(params))
     return feed.to_xml
+end
+
+not_found do
+    status 404
+    erb :fourohfour
+end
+
+error do
+    erb :error, :locals => {:exception => env['sinatra.error'],
+                            :url => request.url}
 end
 
 def sched_from(params)
