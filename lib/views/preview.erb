@@ -1,18 +1,20 @@
-<html><head><title>Preview</title></head>
-<body>
+<%= erb :header, :locals => {'title' => 'Preview'} %>
 <p>
 Here is a preview for <a href="<%= feed_url %>"><%= feed_url %></a>.
 </p>
 
 <ul>
+    <% datefmt = '%a %b %e %Y' %>
     <% for @item in items %>
-        <li><%= @item[0] %></li>
-        <ul><li>Originally: <%= @item[2] %>, Rebroadcast: <%= @item[1] %></li></ul>
+        <li><%= @item[:title] %></li>
+        <ul>
+            <li>Rebroadcast: <%= DateTime.parse(@item[:pubDate]).strftime(datefmt) %></li>
+            <li>Originally: <%= DateTime.parse(@item[:origDate]).strftime(datefmt) %></li>
+        </ul>
     <% end %>
 </ul>
 
 <p>Looks good, don't in?</p>
 
 <p>You can hit up this feed at <a href="<%= rerun_url %>">this link</a>.</p>
-</body>
-</html>
+<%= erb :footer %>

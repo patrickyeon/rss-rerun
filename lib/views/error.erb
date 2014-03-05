@@ -1,5 +1,4 @@
-<html><head><title>Whoops!</title></head>
-
+<%= erb :header, :locals => {'title' => 'Whoops!'} %>
 <body>
 Oh dear, looks like something broke. Here's what I can tell you:<br/>
 <% if exception != nil %>
@@ -8,5 +7,8 @@ Oh dear, looks like something broke. Here's what I can tell you:<br/>
     <p>No error passed in.</p>
 <% end %>
 
-<p>I was trying to access <u><%= url %></u>.</p>
-</body></html>
+<p>I was trying to access <u><%= url %></u>. If you know who is running this server,
+maybe you want to let them know? If you think there's a bug in the software, you can
+harass the original maintainer
+<a href="https://github.com/patrickyeon/rss-rerun">on github</a>.</p>
+<%= erb :footer %>

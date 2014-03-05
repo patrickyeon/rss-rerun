@@ -1,5 +1,4 @@
-<html><head><title>RSS Rebroadcaster</title>
-
+<%= erb :header, :locals => {'title' => 'RSS Rebroadcaster'} %>
 <script type="text/javascript">
 	function checkAll(check) {
 		var form = document.getElementById("scheduleForm");
@@ -10,9 +9,6 @@
 	}
 </script>
 
-</head>
-
-<body>
 <p>Wouldn't it be nice to start that podcast you just discovered from the beginning, but
 also be able to catch up with it so that you can listen in realtime? Or maybe just go through
 a load of old content at your own pace? Now you can!</p>
@@ -60,6 +56,4 @@ a week ago!
 
 	<input type="submit">
 </form>
-
-</body>
-</html>
+<%= erb :footer %>

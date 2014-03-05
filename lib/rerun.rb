@@ -60,9 +60,9 @@ class Rerun
     end
 
     def preview_feed
-        @feed.xpath('//item').collect {|e| [e.at('title').content,
-                                            e.at('pubDate').content,
-                                            e.at_xpath('rerun:origDate').content]}
+        @feed.xpath('//item').collect {|e| {:title => e.at('title').content,
+                                            :pubDate => e.at('pubDate').content,
+                                            :origDate => e.at_xpath('rerun:origDate').content}}
     end
 
     def to_xml
