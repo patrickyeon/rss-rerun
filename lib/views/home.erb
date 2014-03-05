@@ -20,10 +20,14 @@ content on your own terms!</p>
 <p>Why not try now, I've lined up some examples. You can also jump right in and cue up a
 feed I've never heard of.</p>
 
-<a href="rerun?url=http%3A%2F%2Fembedded.fm%2Fepisodes%3Fformat%3Drss&startDate=<%= DateTime.now - 7 %>&schedule=246">Making Embedded Systems</a>, 
+<a href="rerun?url=http%3A%2F%2Fembedded.fm%2Fepisodes%3Fformat%3Drss&startDate=<%= (DateTime.now - 7).strftime('%F') %>&mon&wed&fri">Making Embedded Systems</a>, 
 originally a weekly podcast but you can catch up with episodes on a Monday-Wednesday-Friday
 schedule until you've burnt through the backlog. Better get started, the reruns started
 a week ago!
+<br/>
+<br/>
+
+<a href="rerun?url=http%3A%2F%2Ffeeds.wnyc.org%2Fradiolab&startDate=<%= DateTime.now.strftime('%F') %>&sun&mon&tue&wed&thu&fri&sat">Radiolab</a>, broadcast from WNYC, is a great offering from NPR that does a great job of skimming over some science at just the right level to spur some interest. The re-broadcast starts today (!) and delivers one new show from the archives daily, doesn't even rest for weekends. Unfortunately, the RSS feed doesn't go all the way back to the beginning, so rss-rerun doesn't start from the first episode. Hopefully that can be improved on in a later version.
 
 <br/>
 <br/>
@@ -54,6 +58,6 @@ a week ago!
 	<input type="checkbox" name="sat" class="day" value=""/>Saturday<br/>
 	<br/>
 
-	<input type="submit">
+	<input type="submit" value="Create Reruns"/>
 </form>
 <%= erb :footer %>
