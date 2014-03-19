@@ -1,0 +1,13 @@
+<%= erb :header, :locals => {'title' => 'tick tock tick tock...'} %>
+<body>
+<p>The feed requested at <a href="<%= feed_url %>"><%= feed_url %></a> took too
+long to load. This may be an
+issue with the feed, the service hosting it, or possibly even on our end. If
+there were better error logging included in rss-rerun, I'd promise that the
+relevant people would be notified, but as it stands they won't be.</p>
+
+<p>Feel free to shout at your screen if you think it will make you feel better.
+You could also track down <a href="https://github.com/patrickyeon/rss-rerun">
+the maintainer</a> if you want to try to convince him to help.</p>
+
+<%= erb :footer %>

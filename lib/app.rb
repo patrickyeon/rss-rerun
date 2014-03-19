@@ -32,7 +32,14 @@ get '/preview' do
 
     feedurl = safe_url(params[:url])
 
-    feed = Rerun.new(feedurl, DateTime.now - backdate, schedule)
+    begin
+        feed = Timeout::timeout(7) {
+            # timeout arbitrarily chosen after a brief test with feeds I follow
+            Rerun.new(feedurl, DateTime.now - backdate, schedule)
+        }
+    rescue
+        return erb :timeout, :locals => {:feed_url => feedurl}
+    end
 
     rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(feedurl)
     rss_url += '&startDate=' + (DateTime.now - backdate).strftime('%F')
@@ -50,7 +57,14 @@ get '/rerun' do
         startDate = DateTime.now
     end
 
-    feed = Rerun.new(safe_url(params[:url]), startDate, sched_from(params))
+    begin
+        feed = Timeout::timeout(7) {
+            Rerun.new(safe_url(params[:url]), startDate, sched_from(params))
+        }
+    rescue
+        return erb :timeout, :locals => {:feed_url => params[:url]}
+    end
+
     return feed.to_xml
 end
 

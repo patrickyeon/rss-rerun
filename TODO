@@ -1,10 +1,6 @@
 For 0.1
 =======
 - better copy
-- prevent abuse
-|- rate limit fetching
-- make sure gemfile makes sense
-|- version number gets tracked somewhere?
 
 0.2
 ===
@@ -16,6 +12,7 @@ For 0.1
 - check various formats (RSS 0.9, 2.0, atom, itunes)
 |- mal-formed feeds
 - proper handle on caught-up feeds
+- proper security look-through
 
 0.3
 ===
