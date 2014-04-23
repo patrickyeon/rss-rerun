@@ -3,7 +3,7 @@
 Here is a preview for <a href="<%= feed_url %>"><%= feed_url %></a>.
 </p>
 
-<ul>
+<ul class="feed">
     <% datefmt = '%a %b %e %Y' %>
     <% for @item in items %>
         <li><%= @item[:title] %></li>

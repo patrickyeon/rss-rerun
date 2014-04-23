@@ -9,33 +9,37 @@
 	}
 </script>
 
+<h2>RSS Reruns</h2>
+
 <p>Wouldn't it be nice to start that podcast you just discovered from the beginning, but
 also be able to catch up with it so that you can listen in realtime? Or maybe just go through
 a load of old content at your own pace? Now you can!</p>
 
 <p>Check out my new RSS rebroadcasting service! Just put in a feed URL, a date to start from,
-and a rerun schedule, and wha-bam! I'll give you a whole new feed so that you can consume that
+and a rerun schedule, and wha-bam! It'll give you a whole new feed so that you can consume that
 content on your own terms!</p>
 
 <p>Why not try now, I've lined up some examples. You can also jump right in and cue up a
 feed I've never heard of.</p>
 
+<ul>
+<li>
 <a href="rerun?url=http%3A%2F%2Fembedded.fm%2Fepisodes%3Fformat%3Drss&startDate=<%= (DateTime.now - 7).strftime('%F') %>&mon&wed&fri">Making Embedded Systems</a>, 
 originally a weekly podcast but you can catch up with episodes on a Monday-Wednesday-Friday
-schedule until you've burnt through the backlog. Better get started, the reruns started
+schedule until you've burnt through the backlog. Better get listening, the reruns started
 a week ago!
-<br/>
+</li>
+
 <br/>
 
+<li>
 <a href="rerun?url=http%3A%2F%2Ffeeds.wnyc.org%2Fradiolab&startDate=<%= DateTime.now.strftime('%F') %>&sun&mon&tue&wed&thu&fri&sat">Radiolab</a>, broadcast from WNYC, is a great offering from NPR that does a great job of skimming over some science at just the right level to spur some interest. The re-broadcast starts today (!) and delivers one new show from the archives daily, doesn't even rest for weekends. Unfortunately, the RSS feed doesn't go all the way back to the beginning, so rss-rerun doesn't start from the first episode. Hopefully that can be improved on in a later version.
-
-<br/>
-<br/>
-<br/>
+</li>
+</ul>
 
 <form action="/preview" method="GET" id="scheduleForm">
 	Your own feed of choice:
-	<input type="text" name="url" value="http://embedded.fm/episodes?format=rss">
+	<input type="text" name="url">
 	<br/>
 
 	Start the reruns 
@@ -48,13 +52,13 @@ a week ago!
 	<br/>
 
 	Schedule to re-broadcast on:<br/>
-	<input type="checkbox" onclick="checkAll(this.checked)"/>Select/Clear all<br/>
-	<input type="checkbox" name="sun" class="day" value="" checked/>Sunday<br/>
+	<input type="checkbox" onclick="checkAll(this.checked)"/><i>Select/Clear all</i><br/>
+	<input type="checkbox" name="sun" class="day" value=""/>Sunday<br/>
 	<input type="checkbox" name="mon" class="day" value=""/>Monday<br/>
 	<input type="checkbox" name="tue" class="day" value=""/>Tuesday<br/>
 	<input type="checkbox" name="wed" class="day" value=""/>Wednesday<br/>
-	<input type="checkbox" name="thu" class="day" value="" checked/>Thursday<br/>
-	<input type="checkbox" name="fri" class="day" value="" checked/>Friday<br/>
+	<input type="checkbox" name="thu" class="day" value=""/>Thursday<br/>
+	<input type="checkbox" name="fri" class="day" value=""/>Friday<br/>
 	<input type="checkbox" name="sat" class="day" value=""/>Saturday<br/>
 	<br/>
 
