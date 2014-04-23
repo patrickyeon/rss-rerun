@@ -5,8 +5,12 @@ h1,h2,h3 {color: #014225;}
 h2 {font-variant: small-caps;}
 
 .feed {display: inline-block;
-		background: #f0f0f0;}
+		background: #f0f0f0;
+}
 li {background: #e8e8e8;
 		margin-right: 2%;
+}
+.feed > li {
 		border: 2px solid #dfd;
+		margin-bottom: 10px;
 }
