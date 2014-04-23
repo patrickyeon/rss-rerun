@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rerun (0.0.1)
+    rerun (0.0.2)
       nokogiri
       sinatra
 
