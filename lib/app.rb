@@ -1,5 +1,6 @@
 require_relative 'rerun.rb'
 require_relative 'feed.rb'
+require_relative 'chrono.rb'
 require 'sinatra'
 require 'erb'
 require 'cgi'
@@ -36,14 +37,14 @@ get '/preview' do
     begin
         feed = Timeout::timeout(7) {
             # timeout arbitrarily chosen after a brief test with feeds I follow
-            Rerun.new(Feed.fromUrl(feedurl), DateTime.now - backdate, schedule)
+            Rerun.new(Feed.fromUrl(feedurl), Chrono.now - backdate, schedule)
         }
     rescue
         return erb :timeout, :locals => {:feed_url => feedurl}
     end
 
     rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(feedurl)
-    rss_url += '&startDate=' + (DateTime.now - backdate).strftime('%F')
+    rss_url += '&startDate=' + (Chrono.now - backdate).strftime('%F')
     schedule.chars {|c| rss_url += '&' + Weekdays[c.to_i]}
     erb :preview, :locals => {:items => feed.preview_feed,
                               :feed_url => feedurl,
@@ -55,7 +56,7 @@ get '/rerun' do
     begin
         startDate = DateTime.parse(params[:startDate])
     rescue
-        startDate = DateTime.now
+        startDate = Chrono.now
     end
 
     begin

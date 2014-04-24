@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
+require_relative 'chrono.rb'
 
 class Rerun
     
     def initialize(parsedFeed, startTime = nil, schedule = '0123456')
         @feed = parsedFeed
         # TODO fail out if fetch fails
-        startTime = startTime || DateTime.now
+        startTime = startTime || Chrono.now
         @startTime = DateTime.new(startTime.year, startTime.month, startTime.day)
         @schedule = schedule
         shift_entries
@@ -34,7 +35,7 @@ class Rerun
 
         # TODO this needs a lot more logic to work around what happens as we
         #        catch up with the original feed.
-        while (repubDate < DateTime.now) and (count < entries.length) do
+        while (repubDate < Chrono.now) and (count < entries.length) do
             if @schedule.include?(repubDate.wday.to_s)
 				entry = entries.at(count)
 				# TODO is this the proper way to use a namespace?
