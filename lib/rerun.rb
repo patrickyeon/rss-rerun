@@ -37,12 +37,13 @@ class Rerun
         #        catch up with the original feed.
         while (repubDate < Chrono.now) and (count < entries.length) do
             if @schedule.include?(repubDate.wday.to_s)
+                # TODO item elements are optional, fail gracefully
 				entry = entries.at(count)
 				# TODO is this the proper way to use a namespace?
 				odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed
 				odate.content = entry.at('pubDate').to_str
 				entry.at('pubDate').add_next_sibling odate
-				entry.at('pubDate').content = repubDate
+				entry.at('pubDate').content = repubDate.rfc822
 
 				# add a "originally published on" date to the description
 				datestr = "\n<p> Originally published on " << odate.content << '</p>'
