@@ -1,4 +1,5 @@
 require_relative 'rerun.rb'
+require_relative 'feed.rb'
 require 'sinatra'
 require 'erb'
 require 'cgi'
@@ -35,7 +36,7 @@ get '/preview' do
     begin
         feed = Timeout::timeout(7) {
             # timeout arbitrarily chosen after a brief test with feeds I follow
-            Rerun.new(feedurl, DateTime.now - backdate, schedule)
+            Rerun.new(Feed.fromUrl(feedurl), DateTime.now - backdate, schedule)
         }
     rescue
         return erb :timeout, :locals => {:feed_url => feedurl}
@@ -59,7 +60,8 @@ get '/rerun' do
 
     begin
         feed = Timeout::timeout(7) {
-            Rerun.new(safe_url(params[:url]), startDate, sched_from(params))
+            Rerun.new(Feed.fromUrl(safe_url(params[:url])),
+                      startDate, sched_from(params))
         }
     rescue
         return erb :timeout, :locals => {:feed_url => params[:url]}

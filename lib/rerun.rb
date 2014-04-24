@@ -1,12 +1,9 @@
 #!/usr/bin/env ruby
-require 'nokogiri'
-require 'open-uri'
 
 class Rerun
     
-    def initialize(url, startTime = nil, schedule = '0123456')
-        @url = url
-        @feed = Nokogiri::XML(open(url))
+    def initialize(parsedFeed, startTime = nil, schedule = '0123456')
+        @feed = parsedFeed
         # TODO fail out if fetch fails
         startTime = startTime || DateTime.now
         @startTime = DateTime.new(startTime.year, startTime.month, startTime.day)
@@ -60,6 +57,7 @@ class Rerun
     end
 
     def preview_feed
+        # TODO item elements are optional, fail gracefully
         @feed.xpath('//item').collect {|e| {:title => e.at('title').content,
                                             :link => e.at('link').content,
                                             :pubDate => e.at('pubDate').content,

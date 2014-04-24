@@ -1,11 +1,12 @@
-For 0.1
-=======
-- better copy
-- color scheme/design work
+0.1
+===
+- style check
+  - variables and types
+  - whitespace/column count
+  - comments
 
 0.2
 ===
-- explore bundle creation
 - caching
 - buttload of tests
 |- CI through travisCI
@@ -14,6 +15,7 @@ For 0.1
 |- mal-formed feeds
 - proper handle on caught-up feeds
 - proper security look-through
+- "twelve factor app"
 
 0.3
 ===
