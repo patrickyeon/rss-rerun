@@ -5,7 +5,7 @@ class Rerun
     
     def initialize(parsedFeed, startTime = nil, schedule = '0123456')
         @feed = parsedFeed
-        # TODO fail out if fetch fails
+        # TODO fail out if we get a bad feed
         startTime = startTime || Chrono.now
         @startTime = DateTime.new(startTime.year, startTime.month, startTime.day)
         @schedule = schedule
@@ -28,7 +28,6 @@ class Rerun
                                                 'https://github.com/patrickyeon/rerun-rss')
         end
 
-        oneDay = 1
         repubDate = @startTime
         count = 0
         entries = @feed.xpath('//item').reverse
@@ -50,9 +49,10 @@ class Rerun
 				entry.at('description').content = entry.at('description').content + datestr
                 count += 1
             end
-            repubDate = repubDate + oneDay
+            repubDate += 1
         end
 
+        # clear out any entries that aren't to be replayed yet
         entries[count .. -1].each do |e|
             e.remove
         end

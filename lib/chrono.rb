@@ -3,6 +3,7 @@ require 'singleton'
 
 class Chrono
     include Singleton
+    @@internal_time = nil
 
     def initialize
         enable_truth
