@@ -37,6 +37,7 @@ class Rerun
         while (repubDate < Chrono.now) and (count < entries.length) do
             if @schedule.include?(repubDate.wday.to_s)
                 entry = entries.at(count)
+
                 if entry.at('pubDate') != nil
                     # TODO is this the proper way to use a namespace?
                     odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed
@@ -45,8 +46,8 @@ class Rerun
 
                     if entry.at('description') != nil
                         # add a "originally published on" date to the description
-                        datestr = "\n<p> Originally published on " << odate.content << '</p>'
-                        entry.at('description').content = entry.at('description').content + datestr
+                        datestr = "\n<p> Originally published on %s</p>" % odate.content
+                        entry.at('description').content += datestr
                     end
                 else
                     entry.add_child Nokogiri::XML::Node.new('pubDate', @feed)
