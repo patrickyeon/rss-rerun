@@ -34,21 +34,37 @@ class RerunUnitTests < Test::Unit::TestCase
             addnode item, 'title', ('Item ' << i.to_s)
             addnode item, 'link', ('http://example.com/feed/' << i.to_s)
             addnode item, 'pubDate', (startDate + i).rfc822
-			addnode item, 'description', 'foo'
+            addnode item, 'description', 'foo'
         end
     end
 
     def test_mwf
         # check that a MWF schedule which should have 5 items works
         r = Rerun.new(@doc, startTime = Chrono.now - 12, schedule = '135')
-		items = Nokogiri::XML(r.to_xml).xpath('//item')
-		assert_equal 5, items.length
-		for day, it in [18, 16, 14, 11, 9].zip(items)
-			date = DateTime.parse(it.at('pubDate').to_str)
-			assert_equal 2014, date.year
-			assert_equal 4, date.month
-			assert_equal day, date.day
-		end
+        items = Nokogiri::XML(r.to_xml).xpath('//item')
+        assert_equal 5, items.length
+        for day, it in [18, 16, 14, 11, 9].zip(items)
+            date = DateTime.parse(it.at('pubDate').to_str)
+            assert_equal 2014, date.year
+            assert_equal 4, date.month
+            assert_equal day, date.day
+        end
     end
 
+    def test_no_pubdate
+        #remove the pubDates
+        for item in @doc.xpath('//item')
+            item.at('pubDate').remove
+        end
+
+        r = Rerun.new(@doc, startTime = Chrono.now - 12, schedule = '135')
+        items = Nokogiri::XML(r.to_xml).xpath('//item')
+        assert_equal 5, items.length
+        for day, it in [18, 16, 14, 11, 9].zip(items)
+            date = DateTime.parse(it.at('pubDate').to_str)
+            assert_equal 2014, date.year
+            assert_equal 4, date.month
+            assert_equal day, date.day
+        end
+    end
 end
