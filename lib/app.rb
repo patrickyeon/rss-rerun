@@ -23,7 +23,7 @@ get '/preview' do
     backdate = 0
     begin
         backdate = Integer(params[:backdate])
-		# arbitrarily, limit how long ago the feed can start
+        # arbitrarily, limit how long ago the feed can start
         unless 0 <= backdate and backdate <= 28
             backdate = 0
         end
@@ -40,7 +40,8 @@ get '/preview' do
             Rerun.new(Feed.fromUrl(feedurl), Chrono.now - backdate, schedule)
         }
     rescue
-		# error out, made for timeouts but will also get triggered for eg. 404
+        # error out, made for timeouts but will also get triggered for eg. 404
+        # TODO something should really be done about a status code
         return erb :timeout, :locals => {:feed_url => feedurl}
     end
 
@@ -66,8 +67,10 @@ get '/rerun' do
                       startDate, sched_from(params))
         }
     rescue
-		# TODO seeing as this is expected to be a feed, I think it would be more
-		#   appropriate to signal a temporary error status
+        # TODO seeing as this is expected to be a feed, I think it would be more
+        #   appropriate to signal a temporary error status
+        #   Just setting status to 404 triggers the not_found page, which is not
+        #   what I want to do
         return erb :timeout, :locals => {:feed_url => params[:url]}
     end
 
@@ -85,7 +88,7 @@ error do
 end
 
 def sched_from(params)
-	# map the http GET args like '&mon=&tue=&thu=' to a string of ints, 0=Sun
+    # map the http GET args like '&mon=&tue=&thu=' to a string of ints, 0=Sun
     retstr = ''
     Weekdays.each_with_index do |day, i|
         if params.has_key?(day)

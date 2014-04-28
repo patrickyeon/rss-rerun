@@ -39,7 +39,6 @@ class Rerun
                 entry = entries.at(count)
 
                 if entry.at('pubDate') != nil
-                    # TODO is this the proper way to use a namespace?
                     odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed
                     odate.content = entry.at('pubDate').to_str
                     entry.add_child odate
