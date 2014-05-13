@@ -9,8 +9,9 @@ class Feed
 end
 
 class Archive
-    def self.fromUrl(url)
-        text = open(url)
+    def self.fromUrl(url, proxy=nil)
+        text = open('http://web.archive.org/web/timemap/link/' + url,
+                    :proxy=>proxy)
         links = []
         while not text.eof? do
             temp = text.readline
@@ -21,10 +22,49 @@ class Archive
             end
         end
 
-        links.collect {|link| memento(link)}
+        links = links.collect {|link| memento(link)}
+        # links is now an array of hashes, each hash is url=>{prop=>[values]}
+        links.keep_if { |link| link.values()[0]['rel'][0].split().include?('memento') }
+        if not links[-1].values()[0]['rel'][0].split().include?('last')
+            raise NameError.new('paginated rss feed')
+        end
+
+        items = {}
+        guids = []
+        links.each do |link|
+            memento = Nokogiri::XML(open(link.keys()[0]))
+            entries = memento.xpath('//item').reverse
+            entries.each do |e|
+                if e.at('guid') == nil
+                    raise NameError.new('entry has no guid')
+                end
+                guid = e.at('guid').content
+                if not items.has_key? guid
+                    items[guid] = e
+                    guids.push(guid)
+                end
+            end
+        end
+
+        # make a new doc with all the items
+        guids = guids.reverse()
+        total = Nokogiri::XML(open(links[0].keys()[0]))
+        total.xpath('//item').each do |e|
+            e.remove
+        end
+
+        chan = total.at('channel')
+        guids.each do |guid|
+            chan.add_child items[guid]
+        end
+
+        return total.to_xml
+
     end
 
     def self.memento(link)
+        # pretty much just a port of parse_link.py from 
+        # https://bitbucket.org/azaroth42/linkheaderparser
         link.strip!
         retval = {}
         uri = ''
