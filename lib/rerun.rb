@@ -16,21 +16,22 @@ class Rerun
         # TODO make sure this only happens once. For now, it's just a private
         #        method and we call it during initialization
 
-        if DateTime.now < @startTime
-            @feed.xpath('//item').each {|e| e.remove}
+        if Chrono.now < @startTime
+
+            @feed.items.each {|e| e.remove}
             return
         end
 
         # make sure we have our namespace here
-        unless @feed.root.namespaces.key('xmlns:rerun')
+        unless @feed.feed.root.namespaces.key('xmlns:rerun')
             # TODO find a real URL for the namespace to point to
-            @feed.root.add_namespace_definition('rerun',
-                                                'https://github.com/patrickyeon/rerun-rss')
+            @feed.feed.root.add_namespace_definition('rerun',
+                                                     'https://github.com/patrickyeon/rerun-rss')
         end
 
         repubDate = @startTime
         count = 0
-        entries = @feed.xpath('//item').reverse
+        entries = @feed.items
 
         # TODO this needs a lot more logic to work around what happens as we
         #        catch up with the original feed.
@@ -39,7 +40,7 @@ class Rerun
                 entry = entries.at(count)
 
                 if entry.at('pubDate') != nil
-                    odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed
+                    odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed.feed
                     odate.content = entry.at('pubDate').to_str
                     entry.add_child odate
 
@@ -49,7 +50,7 @@ class Rerun
                         entry.at('description').content += datestr
                     end
                 else
-                    entry.add_child Nokogiri::XML::Node.new('pubDate', @feed)
+                    entry.add_child Nokogiri::XML::Node.new('pubDate', @feed.feed)
                 end
                 entry.at('pubDate').content = repubDate.rfc822
 
@@ -60,7 +61,7 @@ class Rerun
 
         # clear out any entries that aren't to be replayed yet
         entries[count .. -1].each do |e|
-            e.remove
+            @feed.items.delete e
         end
     end
 
@@ -72,7 +73,7 @@ class Rerun
                 return node_or_nil.content
             end
         end
-        @feed.xpath('//item').collect {|e| {:title => _str(e.at('title')),
+        @feed.items.reverse.collect {|e| {:title => _str(e.at('title')),
                                             :link => _str(e.at('link')),
                                             :pubDate => _str(e.at('pubDate')),
                                             :origDate => _str(e.at_xpath('rerun:origDate'))}}

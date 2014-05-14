@@ -3,12 +3,105 @@ require 'nokogiri'
 require 'open-uri'
 
 class Feed
+    attr_accessor :feed, :items
+    
     def self.fromUrl(url)
-        Nokogiri::XML(open(url))
+        feed, items = self.breakup(url)
+        return self.new(feed, items)
     end
+
+    def self.breakup(url)
+        feed = Nokogiri::XML(open(url))
+        items = feed.xpath('//item').reverse
+        items.collect {|item| item.remove}
+        return [feed, items]
+    end
+
+    def self.fromArchive(url, arc)
+        # check if we've got an archived version
+        if not arc.cached? url
+            arc.create url
+        end
+        arcitems = Nokogiri::XML(arc.recall url)
+        # bring in the latest
+        feed, items = self.breakup(url)
+        updated = false
+        guids = arcitems.collect {|item| item.at('guid').content}
+        # arc + latest > arc?
+        items.reverse.each do |item|
+            if not guids.include? item.at('guid').content
+                arcitems.push item
+                updated = true
+            end
+        end
+        if updated
+            arc.update(url, arcitems.to_xml)
+        end
+
+        return self.new(feed, arcitems)
+    end
+
+    def initialize(emptyfeed, items)
+        # items must be ordered oldest to newest
+        @feed = emptyfeed
+        @items = items
+    end
+
+    def to_xml
+        retval = @feed.clone
+        chan = retval.at('channel')
+        @items.reverse.each do |item|
+            chan.add_child item
+        end
+        return retval.to_xml
+    end
+
 end
 
 class Archive
+
+    def initialize(dir)
+        if not dir.end_with?('/')
+            dir.concat('/')
+        end
+        @dir = dir
+        @index = Marshal::load(File.open(dir + 'index'))
+        @maxIdx = @index.values.sort[-1] || 0
+    end
+
+    def cached?(url)
+        return @index.has_key? url
+    end
+
+    def update(url, items)
+        # items are stored ordered oldest to newest
+        if not @index.has_key? url
+            @maxIdx += 1
+            @index[url] = @maxIdx
+        end
+        f = File.open('%s%d' % [@dir, @maxIdx], 'w')
+        f.print('<xml>' + items + '</xml>')
+        f.close
+    end
+
+    def create(url)
+        feed = Archive.fromUrl(url)
+        # TODO avoid jumping back and forth through Nokogiri
+        items = Nokogiri::XML(feed).xpath('//item').reverse.to_xml
+        self.update(url, items)
+    end
+
+    def recall(url)
+        if not self.cached? url
+            return ''
+        end
+
+        f = File.open('%s%d' % [@dir, @index[url]])
+        items = f.read
+        f.close
+        return items
+    end
+
     def self.fromUrl(url, proxy=nil)
         text = open('http://web.archive.org/web/timemap/link/' + url,
                     :proxy=>proxy)
