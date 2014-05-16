@@ -1,4 +1,5 @@
 require_relative '../lib/rerun.rb'
+require_relative '../lib/feed.rb'
 require_relative '../lib/chrono.rb'
 require 'test/unit'
 require 'nokogiri'
@@ -40,7 +41,8 @@ class RerunUnitTests < Test::Unit::TestCase
 
     def test_mwf
         # check that a MWF schedule which should have 5 items works
-        r = Rerun.new(@doc, startTime = Chrono.now - 12, schedule = '135')
+        feed = Feed.fromResource(@doc.to_xml)
+        r = Rerun.new(feed, startTime = Chrono.now - 12, schedule = '135')
         items = Nokogiri::XML(r.to_xml).xpath('//item')
         assert_equal 5, items.length
         for day, it in [18, 16, 14, 11, 9].zip(items)
@@ -57,7 +59,8 @@ class RerunUnitTests < Test::Unit::TestCase
             item.at('pubDate').remove
         end
 
-        r = Rerun.new(@doc, startTime = Chrono.now - 12, schedule = '135')
+        feed = Feed.fromResource(@doc.to_xml)
+        r = Rerun.new(feed, startTime = Chrono.now - 12, schedule = '135')
         items = Nokogiri::XML(r.to_xml).xpath('//item')
         assert_equal 5, items.length
         for day, it in [18, 16, 14, 11, 9].zip(items)

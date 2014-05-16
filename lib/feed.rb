@@ -6,12 +6,16 @@ class Feed
     attr_accessor :feed, :items
     
     def self.fromUrl(url)
-        feed, items = self.breakup(url)
+        return self.fromResource(open(url)).read
+    end
+
+    def self.fromResource(text)
+        feed, items = self.breakup(text)
         return self.new(feed, items)
     end
 
-    def self.breakup(url)
-        feed = Nokogiri::XML(open(url))
+    def self.breakup(text)
+        feed = Nokogiri::XML(text)
         items = feed.xpath('//item').reverse
         items.collect {|item| item.remove}
         return [feed, items]
