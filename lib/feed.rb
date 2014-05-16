@@ -65,7 +65,9 @@ class Archive
             dir.concat('/')
         end
         @dir = dir
-        @index = Marshal::load(File.open(dir + 'index'))
+        f = File.open(dir + 'index')
+        @index = Marshal::load(f)
+        f.close
         @maxIdx = @index.values.sort[-1] || 0
     end
 
@@ -75,9 +77,13 @@ class Archive
 
     def update(url, items)
         # items are stored ordered oldest to newest
+        # FIXME not safe for multi-process
         if not @index.has_key? url
             @maxIdx += 1
             @index[url] = @maxIdx
+            idx = File.open(@dir + 'index', 'w')
+            idx.print(Marshal::dump(@index))
+            idx.close
         end
         f = File.open('%s%d' % [@dir, @maxIdx], 'w')
         f.print('<xml>' + items + '</xml>')
@@ -102,12 +108,15 @@ class Archive
         return items
     end
 
-    def self.fromUrl(url, proxy=nil)
-        text = open('http://web.archive.org/web/timemap/link/' + url,
-                    :proxy=>proxy)
+    def self.fromUrl(url)
+        file = open('http://web.archive.org/web/timemap/link/' + url)
+        return Archive.fromResource(file)
+    end
+
+    def self.fromResource(res)
         links = []
-        while not text.eof? do
-            temp = text.readline
+        while not res.eof? do
+            temp = res.readline
             if temp.start_with?(' ') or temp.start_with?('\t')
                 links[-1] += temp
             else

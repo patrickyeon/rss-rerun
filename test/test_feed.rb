@@ -2,25 +2,38 @@ require_relative '../lib/feed.rb'
 require 'test/unit'
 
 class FeedUnitTests < Test::Unit::TestCase
-    def setup
-        @proxy = 'http://localhost:8123'
+    def posts(feed)
+        return Nokogiri::XML(feed).xpath('//item')
+    end
+    def test_from_mementos
+        feed = Archive.fromResource(File.open('test/data/timemap'))
+        items = posts(feed)
+        assert_equal 8, items.length
+        guids = items.collect {|item| Integer(item.at('guid').content)}
+        assert_equal Array(1..8).reverse, guids
     end
 
-    def no_test_tah
-        feed = Archive.fromUrl('theamphour.com/feed', @proxy)
-        puts '%d items from TAH' % Nokogiri::XML(feed).xpath('//item').length
-    end
-
-    def no_test_fromurl
-        f = Feed.fromUrl('http://theamphour.com/feed')
-        puts ' success, %d items' % f.items.length
+    def test_create_feed
+        f = Feed.fromUrl('test/data/mem2')
+        items = posts(f.to_xml)
+        guids = items.collect {|item| Integer(item.at('guid').content)}
+        assert_equal Array(1..5).reverse, guids
     end
 
     def test_archive
-        url = 'http://theamphour.com/feed'
-        a = Archive.new('data/db')
+        # use a local timemap instead of hitting the archive.org servers
+        def Archive.fromUrl(url)
+            return Archive.fromResource(File.open('test/data/timemap'))
+        end
+
+        f = File.open('test/temp/db/index', 'w')
+        f.print(Marshal::dump({}))
+        f.close
+        a = Archive.new('test/temp/db')
+
+        url = 'test/data/memorig'
         a.create(url)
         assert a.cached?(url)
-        assert_equal Nokogiri::XML(a.recall(url)).xpath('//item').length, 25
+        assert_equal 8, Nokogiri::XML(a.recall(url)).xpath('//item').length
     end
 end
