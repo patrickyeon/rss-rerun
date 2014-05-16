@@ -6,7 +6,7 @@ class Feed
     attr_accessor :feed, :items
     
     def self.fromUrl(url)
-        return self.fromResource(open(url)).read
+        return self.fromResource(open(url).read)
     end
 
     def self.fromResource(text)

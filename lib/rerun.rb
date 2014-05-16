@@ -76,7 +76,10 @@ class Rerun
         @feed.items.reverse.collect {|e| {:title => _str(e.at('title')),
                                             :link => _str(e.at('link')),
                                             :pubDate => _str(e.at('pubDate')),
-                                            :origDate => _str(e.at_xpath('rerun:origDate'))}}
+                                            # namespacing buggers things up
+                                            #:origDate => _str(e.at_xpath('//rerun:origDate'))}}
+                                            :origDate => _str(e.children.select {
+                                                |node| node.name == 'rerun:origDate'}[0])}}
     end
 
     def to_xml
