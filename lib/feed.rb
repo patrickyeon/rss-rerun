@@ -293,7 +293,7 @@ class S3Archive < Archive
 
     def update(url, items)
         AWS::S3::S3Object.store(keyfor(url),
-                                '<xml><url="' + url + '"/>' + items + '</xml>',
+                                '<xml><url>' + url + '</url>' + items + '</xml>',
                                 @bucket.name)
     end
 
@@ -303,7 +303,7 @@ class S3Archive < Archive
         end
         
         items = @bucket[keyfor(url)].value
-        if not items.start_with?('<xml><url="' + url + '"/>')
+        if not items.start_with?('<xml><url>' + url + '</url>')
             # as a matter of fact, no, collisions aren't handled well
             return ''
         end
