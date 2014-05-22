@@ -6,7 +6,7 @@ class FeedUnitTests < Test::Unit::TestCase
         return Nokogiri::XML(feed).xpath('//item')
     end
     def test_from_mementos
-        feed = Archive.fromResource(File.open('test/data/timemap'))
+        feed = LocalArchive.fromResource(File.open('test/data/timemap'))
         items = posts(feed)
         assert_equal 8, items.length
         guids = items.collect {|item| Integer(item.at('guid').content)}
@@ -29,9 +29,9 @@ class FeedUnitTests < Test::Unit::TestCase
         f = File.open('test/temp/db/index', 'w')
         f.print(Marshal::dump({}))
         f.close
-        a = Archive.new('test/temp/db')
+        a = LocalArchive.new('test/temp/db')
 
-        url = 'test/data/memorig'
+        url = 'test/data/original'
         a.create(url)
         assert a.cached?(url)
         assert_equal 8, Nokogiri::XML(a.recall(url)).xpath('//item').length
