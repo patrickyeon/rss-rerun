@@ -35,9 +35,18 @@ get '/preview' do
     feedurl = safe_url(params[:url])
 
     begin
-        feed = Timeout::timeout(7) {
-            # timeout arbitrarily chosen after a brief test with feeds I follow
-            Rerun.new(Feed.fromUrl(feedurl), Chrono.now - backdate, schedule)
+        feed = Timeout::timeout(35) {
+            # timeout arbitrarily chosen
+            # TODO fire off creating a new archive to another process
+            if params.has_key?('magic') && whitelisted?(feedurl)
+                archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                        ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                        ENV['AMAZON_S3_TEST_BUCKET'])
+                origfeed = Feed.fromArchive(feedurl, archive)
+            else
+                origfeed = Feed.fromUrl(feedurl)
+            end
+            Rerun.new(origfeed, Chrono.now - backdate, schedule)
         }
     rescue
         # error out, made for timeouts but will also get triggered for eg. 404
@@ -48,6 +57,9 @@ get '/preview' do
     rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(feedurl)
     rss_url += '&startDate=' + (Chrono.now - backdate).strftime('%F')
     schedule.chars {|c| rss_url += '&' + Weekdays[c.to_i]}
+    if params.has_key?('magic')
+        rss_url += '&magic'
+    end
     erb :preview, :locals => {:items => feed.preview_feed,
                               :feed_url => feedurl,
                               :rerun_url => rss_url}
@@ -62,9 +74,17 @@ get '/rerun' do
     end
 
     begin
-        feed = Timeout::timeout(7) {
-            Rerun.new(Feed.fromUrl(safe_url(params[:url])),
-                      startDate, sched_from(params))
+        feedurl = safe_url(params[:url])
+        feed = Timeout::timeout(35) {
+            if params.has_key?('magic') && whitelisted?(feedurl)
+                archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                        ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                        ENV['AMAZON_S3_TEST_BUCKET'])
+                origfeed = Feed.fromArchive(feedurl, archive)
+            else
+                origfeed = Feed.fromUrl(feedurl)
+            end
+            Rerun.new(origfeed, startDate, sched_from(params))
         }
     rescue
         # TODO seeing as this is expected to be a feed, I think it would be more
@@ -109,4 +129,8 @@ def safe_url(url)
     end
 
     return returl
+end
+
+def whitelisted?(url)
+    return ['http://theamphour.com/feed'].include?(url)
 end
