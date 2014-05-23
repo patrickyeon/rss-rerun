@@ -130,7 +130,11 @@ class Archive
 
         chan = total.at('channel')
         guids.each do |guid|
-            chan.add_child items[guid]
+            if chan.children.empty?
+                chan.add_child items[guid]
+            else
+                chan.children.after items[guid]
+            end
         end
 
         return total.to_xml
