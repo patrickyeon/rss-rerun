@@ -27,13 +27,13 @@ class Feed
         if not arc.cached? url
             arc.create url
         end
-        arcitems = Nokogiri::XML(arc.recall url)
+        arcitems = Nokogiri::XML(arc.recall url).xpath('//item')
         # bring in the latest
-        feed, items = self.breakup(url)
+        feed, items = self.breakup(open(url).read)
         updated = false
         guids = arcitems.collect {|item| item.at('guid').content}
         # arc + latest > arc?
-        items.reverse.each do |item|
+        items.each do |item|
             if not guids.include? item.at('guid').content
                 arcitems.push item
                 updated = true

@@ -40,6 +40,20 @@ class FeedUnitTests < Test::Unit::TestCase
         assert_equal 8, Nokogiri::XML(a.recall(url)).xpath('//item').length
     end
 
+    def test_total_local_archive
+        f = File.open('test/temp/db/index', 'w')
+        f.print(Marshal::dump({}))
+        f.close
+        a = LocalArchive.new('test/temp/db')
+        
+        url = 'test/data/original'
+        a.create(url)
+        feed = Feed.fromArchive(url, a)
+        assert_equal 10, feed.items.length
+        guids = feed.items.collect {|item| Integer(item.at('guid').content)}
+        assert_equal Array(1..10), guids
+    end
+
     def test_s3_archive
         a = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
                           ENV['AMAZON_SECRET_ACCESS_KEY'],
