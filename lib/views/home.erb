@@ -7,7 +7,18 @@
 				form.elements[i].checked = check;
 			}
 	}
+    function showMagic(check) {
+        var text = document.getElementById("magic-warn");
+        if (check) {
+            text.style.display = 'block';
+        } else {
+            text.style.display = 'none';
+        }
+    }
 </script>
+<style>
+    #magic-warn {display:none;}
+</style>
 
 <h2>RSS Reruns</h2>
 
@@ -62,6 +73,10 @@ a week ago!
 	<input type="checkbox" name="sat" class="day" value=""/>Saturday<br/>
 	<br/>
 
-	<input type="submit" value="Create Reruns"/>
+	<input type="submit" value="Create Reruns"/><br/>
+    <input type="checkbox" name="archive" value="" onclick="showMagic(this.checked)"/>
+    Enable magic. <span id="magic-warn"><i>Magic</i> is a set of beta features only
+    enabled for a small number of feeds that are known not to break them. If it
+    breaks or refuses to run on your feed of choice, too bad!</span>
 </form>
 <%= erb :footer %>

@@ -38,7 +38,7 @@ get '/preview' do
         feed = Timeout::timeout(35) {
             # timeout arbitrarily chosen
             # TODO fire off creating a new archive to another process
-            if params.has_key?('magic') && whitelisted?(feedurl)
+            if params.has_key?('archive') && whitelisted?(feedurl)
                 archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
                                         ENV['AMAZON_SECRET_ACCESS_KEY'],
                                         ENV['AMAZON_S3_TEST_BUCKET'])
@@ -57,8 +57,8 @@ get '/preview' do
     rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(feedurl)
     rss_url += '&startDate=' + (Chrono.now - backdate).strftime('%F')
     schedule.chars {|c| rss_url += '&' + Weekdays[c.to_i]}
-    if params.has_key?('magic')
-        rss_url += '&magic'
+    if params.has_key?('archive')
+        rss_url += '&archive'
     end
     erb :preview, :locals => {:items => feed.preview_feed,
                               :feed_url => feedurl,
@@ -76,7 +76,7 @@ get '/rerun' do
     begin
         feedurl = safe_url(params[:url])
         feed = Timeout::timeout(35) {
-            if params.has_key?('magic') && whitelisted?(feedurl)
+            if params.has_key?('archive') && whitelisted?(feedurl)
                 archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
                                         ENV['AMAZON_SECRET_ACCESS_KEY'],
                                         ENV['AMAZON_S3_TEST_BUCKET'])
