@@ -63,6 +63,10 @@ class Feed
 
 end
 
+class MementoParsingError < StandardError
+    # for when the memento file can't be successfully interpreted
+end
+
 class Archive
     def cached?(url)
         raise NotImplementedError
@@ -101,7 +105,7 @@ class Archive
         # links is now an array of hashes, each hash is url=>{prop=>[values]}
         links.keep_if { |link| link.values()[0]['rel'][0].split().include?('memento') }
         if not links[-1].values()[0]['rel'][0].split().include?('last')
-            raise NameError.new('paginated rss feed')
+            raise NotImplementedError.new('Paginated mementos not handled yet')
         end
 
         items = {}
@@ -111,7 +115,7 @@ class Archive
             entries = memento.xpath('//item').reverse
             entries.each do |e|
                 if e.at('guid') == nil
-                    raise NameError.new('entry has no guid')
+                    raise NotImplementedError.new('Feeds without GUIDs cannot be cached')
                 end
                 guid = e.at('guid').content
                 if not items.has_key? guid
@@ -170,7 +174,7 @@ class Archive
         while link.length > 0 do
             if state == :start
                 if not link.start_with? '<'
-                    raise NameError.new('start %s' % link)
+                    raise MementoParsingError.new('< expected at start')
                     return nil
                 end
                 link = link[1..-1].strip
@@ -178,7 +182,7 @@ class Archive
             elsif state == :uri
                 idx = link.index '>'
                 if idx == nil
-                    raise NameError.new('uri %s' % link)
+                    raise MementoParsingError.new('> expected after uri')
                     return nil
                 end
                 uri = link[0..(idx - 1)]
@@ -191,14 +195,14 @@ class Archive
                 elsif link.start_with? ';'
                     state = :linkparam
                 else
-                    raise NameError.new('posturi %s' % link)
+                    raise MementoParsingError.new(', or ; expected' % link)
                     return nil
                 end
                 link = link[1..-1].strip
             elsif state == :linkparam
                 idx = link.index '='
                 if idx == nil
-                    raise NameError.new('linkparam %s' % link)
+                    raise MementoParsingError.new('param without value' % link)
                     return nil
                 end
                 param = link[0..(idx - 1)].strip
