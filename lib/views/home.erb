@@ -17,7 +17,8 @@
     }
 </script>
 <style>
-    #magic-warn {display:none;}
+    #magic-warn {display:none;
+                 background: #eee8d5;}
 </style>
 
 <h2>RSS Reruns</h2>
@@ -63,7 +64,7 @@ a week ago!
 	<br/>
 
 	Schedule to re-broadcast on:<br/>
-	<input type="checkbox" onclick="checkAll(this.checked)"/><i>Select/Clear all</i><br/>
+	<input type="checkbox" onclick="checkAll(this.checked)"/><em>Select/Clear all</em><br/>
 	<input type="checkbox" name="sun" class="day" value=""/>Sunday<br/>
 	<input type="checkbox" name="mon" class="day" value=""/>Monday<br/>
 	<input type="checkbox" name="tue" class="day" value=""/>Tuesday<br/>
@@ -78,7 +79,7 @@ a week ago!
     Enable magic. <span id="magic-warn"><i>Magic</i> is a set of beta features only
     enabled for a small number of feeds that are known not to break them. If it
     breaks or refuses to run on your feed of choice, too bad!<br/>
-    Currently the only magic feed is <a href=#
+    Currently the only magic feed is <a href=#fillURL
         onclick="document.getElementById('feedurl').value='http://theamphour.com/feed';">
     http://theamphour.com/feed</a>.</span>
 </form>
