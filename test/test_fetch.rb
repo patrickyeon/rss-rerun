@@ -3,15 +3,21 @@ require 'test/unit'
 
 class FetchUnitTests < Test::Unit::TestCase
     def setup
-        f = File.open('test/temp/foo', 'w')
-        f.write('foobarbaz')
+        @fname = 'test/temp/foo'
+        @fcont = 'foobarbaz'
+        f = File.open(@fname, 'w')
+        f.write(@fcont)
         f.close
         Fetch.instance.global_sanitize = true
     end
 
+    def teardown
+        Fetch.instance.nil_callback
+    end
+
     def test_just_open
-        f = Fetch.openUrl('test/temp/foo', false)
-        assert_equal 'foobarbaz', f.read
+        f = Fetch.openUrl(@fname, false)
+        assert_equal @fcont, f.read
     end
 
     def test_sanitize_url
@@ -22,15 +28,17 @@ class FetchUnitTests < Test::Unit::TestCase
 
     def test_bypass_sanitize
         Fetch.instance.global_sanitize = false
-        f = Fetch.openUrl('test/temp/foo')
-        assert_equal 'foobarbaz', f.read
+        f = Fetch.openUrl(@fname)
+        assert_equal @fcont, f.read
     end
 
-    def test_sanitize_open
-        # TODO horrible way to test it, but I've spent too much time trying to
-        #  work out the "right way"
-        assert_raises SocketError do
-            Fetch.openUrl 'test/temp/foo'
+    def test_sanitize_open_and_callback
+        cb = lambda do |url|
+            assert_equal 'http://' + @fname, url
+            return File.open(@fname)
         end
+        Fetch.instance.set_callback(&cb)
+        f = Fetch.openUrl(@fname)
+        assert_equal @fcont, f.read
     end
 end

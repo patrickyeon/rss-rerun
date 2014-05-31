@@ -5,9 +5,22 @@ require 'singleton'
 class Fetch
     include Singleton
     @@g_sanitize = true
+    @@callback = nil
 
     def initialize
         @gg_sanitize = true
+        @@callback = nil
+    end
+
+    # FIXME this callback stuff is shit. Gotta be able to do it better
+    # XXX CALLBACKS ARE ONLY FOR TESTING. If you abuse this in non-testing
+    #   code, you are a bad bad person.
+    def set_callback(&block)
+        @@callback = block
+    end
+
+    def nil_callback
+        @@callback = nil
     end
 
     def global_sanitize=(truth)
@@ -18,7 +31,11 @@ class Fetch
         if (sanitize == nil && @@g_sanitize) || sanitize == true
             url = self.sanitize url
         end
-        return self.fetch(url)
+        if @@callback != nil
+            return @@callback.call(url)
+        else
+            return self.fetch(url)
+        end
     end
 
     def self.fetch url
