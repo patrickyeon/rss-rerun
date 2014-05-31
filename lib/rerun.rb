@@ -1,14 +1,12 @@
 #!/usr/bin/env ruby
-require 'nokogiri'
-require 'open-uri'
+require_relative 'chrono.rb'
 
 class Rerun
     
-    def initialize(url, startTime = nil, schedule = '0123456')
-        @url = url
-        @feed = Nokogiri::XML(open(url))
-        # TODO fail out if fetch fails
-        startTime = startTime || DateTime.now
+    def initialize(parsedFeed, startTime = nil, schedule = '0123456')
+        @feed = parsedFeed
+        # TODO fail out if we get a bad feed
+        startTime = startTime || Chrono.now
         @startTime = DateTime.new(startTime.year, startTime.month, startTime.day)
         @schedule = schedule
         shift_entries
@@ -18,52 +16,70 @@ class Rerun
         # TODO make sure this only happens once. For now, it's just a private
         #        method and we call it during initialization
 
-        if DateTime.now < @startTime
-            @feed.xpath('//item').each {|e| e.remove}
+        if Chrono.now < @startTime
+
+            @feed.items.each {|e| e.remove}
             return
         end
 
         # make sure we have our namespace here
-        unless @feed.root.namespaces.key('xmlns:rerun')
+        unless @feed.feed.root.namespaces.key('xmlns:rerun')
             # TODO find a real URL for the namespace to point to
-            @feed.root.add_namespace_definition('rerun',
-                                                'https://github.com/patrickyeon/rerun-rss')
+            @feed.feed.root.add_namespace_definition('rerun',
+                                                     'https://github.com/patrickyeon/rerun-rss')
         end
 
-        oneDay = 1
         repubDate = @startTime
         count = 0
-        entries = @feed.xpath('//item').reverse
+        entries = @feed.items
 
         # TODO this needs a lot more logic to work around what happens as we
         #        catch up with the original feed.
-        while (repubDate < DateTime.now) and (count < entries.length) do
+        while (repubDate < Chrono.now) and (count < entries.length) do
             if @schedule.include?(repubDate.wday.to_s)
-				entry = entries.at(count)
-				# TODO is this the proper way to use a namespace?
-				odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed
-				odate.content = entry.at('pubDate').to_str
-				entry.at('pubDate').add_next_sibling odate
-				entry.at('pubDate').content = repubDate
+                entry = entries.at(count)
 
-				# add a "originally published on" date to the description
-				datestr = "\n<p> Originally published on " << odate.content << '</p>'
-				entry.at('description').content = entry.at('description').content + datestr
+                if entry.at('pubDate') != nil
+                    odate = Nokogiri::XML::Node.new 'rerun:origDate', @feed.feed
+                    odate.content = entry.at('pubDate').to_str
+                    entry.add_child odate
+
+                    if entry.at('description') != nil
+                        # add a "originally published on" date to the description
+                        datestr = "\n<p> Originally published on %s</p>" % odate.content
+                        entry.at('description').content += datestr
+                    end
+                else
+                    entry.add_child Nokogiri::XML::Node.new('pubDate', @feed.feed)
+                end
+                entry.at('pubDate').content = repubDate.rfc822
+
                 count += 1
             end
-            repubDate = repubDate + oneDay
+            repubDate += 1
         end
 
+        # clear out any entries that aren't to be replayed yet
         entries[count .. -1].each do |e|
-            e.remove
+            @feed.items.delete e
         end
     end
 
     def preview_feed
-        @feed.xpath('//item').collect {|e| {:title => e.at('title').content,
-                                            :link => e.at('link').content,
-                                            :pubDate => e.at('pubDate').content,
-                                            :origDate => e.at_xpath('rerun:origDate').content}}
+        def _str node_or_nil
+            if node_or_nil == nil
+                return ''
+            else
+                return node_or_nil.content
+            end
+        end
+        @feed.items.reverse.collect {|e| {:title => _str(e.at('title')),
+                                            :link => _str(e.at('link')),
+                                            :pubDate => _str(e.at('pubDate')),
+                                            # namespacing buggers things up
+                                            #:origDate => _str(e.at_xpath('//rerun:origDate'))}}
+                                            :origDate => _str(e.children.select {
+                                                |node| node.name == 'rerun:origDate'}[0])}}
     end
 
     def to_xml

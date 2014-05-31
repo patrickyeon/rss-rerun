@@ -1,0 +1,7 @@
+<test/data/original>; rel="original",
+<test/data/timemap>; rel="self"; type="application/link-format"; from="Wed, 18 Aug 2010 07:58:44 GMT"; until="Mon 14 Oct 2013 07:58:44 GMT",
+<test/data/mem1>; rel="first memento"; datetime="Wed, 18 Aug 2010 07:58:44 GMT",
+<test/data/mem2>; rel="memento"; datetime="Tue, 11 Nov 2010 07:58:44 GMT",
+<test/data/mem3>; rel="memento"; datetime="Sat, 16 Jul 2011 07:58:44 GMT",
+<test/data/mem4>; rel="memento"; datetime="Tue, 24 Jan 2012 07:58:44 GMT",
+<test/data/mem5>; rel="last memento"; datetime="Mon 14 Oct 2013 07:58:44 GMT"

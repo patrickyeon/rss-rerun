@@ -1,4 +1,6 @@
 require_relative 'rerun.rb'
+require_relative 'feed.rb'
+require_relative 'chrono.rb'
 require 'sinatra'
 require 'erb'
 require 'cgi'
@@ -21,6 +23,7 @@ get '/preview' do
     backdate = 0
     begin
         backdate = Integer(params[:backdate])
+        # arbitrarily, limit how long ago the feed can start
         unless 0 <= backdate and backdate <= 28
             backdate = 0
         end
@@ -29,21 +32,34 @@ get '/preview' do
     end
 
     schedule = sched_from(params)
-
     feedurl = safe_url(params[:url])
 
     begin
-        feed = Timeout::timeout(7) {
-            # timeout arbitrarily chosen after a brief test with feeds I follow
-            Rerun.new(feedurl, DateTime.now - backdate, schedule)
+        feed = Timeout::timeout(35) {
+            # timeout arbitrarily chosen
+            # TODO fire off creating a new archive to another process
+            if params.has_key?('archive') && whitelisted?(feedurl)
+                archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                        ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                        ENV['AMAZON_S3_TEST_BUCKET'])
+                origfeed = Feed.fromArchive(feedurl, archive)
+            else
+                origfeed = Feed.fromUrl(feedurl)
+            end
+            Rerun.new(origfeed, Chrono.now - backdate, schedule)
         }
     rescue
+        # error out, made for timeouts but will also get triggered for eg. 404
+        # TODO something should really be done about a status code
         return erb :timeout, :locals => {:feed_url => feedurl}
     end
 
     rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(feedurl)
-    rss_url += '&startDate=' + (DateTime.now - backdate).strftime('%F')
+    rss_url += '&startDate=' + (Chrono.now - backdate).strftime('%F')
     schedule.chars {|c| rss_url += '&' + Weekdays[c.to_i]}
+    if params.has_key?('archive')
+        rss_url += '&archive'
+    end
     erb :preview, :locals => {:items => feed.preview_feed,
                               :feed_url => feedurl,
                               :rerun_url => rss_url}
@@ -54,14 +70,27 @@ get '/rerun' do
     begin
         startDate = DateTime.parse(params[:startDate])
     rescue
-        startDate = DateTime.now
+        startDate = Chrono.now
     end
 
     begin
-        feed = Timeout::timeout(7) {
-            Rerun.new(safe_url(params[:url]), startDate, sched_from(params))
+        feedurl = safe_url(params[:url])
+        feed = Timeout::timeout(35) {
+            if params.has_key?('archive') && whitelisted?(feedurl)
+                archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                        ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                        ENV['AMAZON_S3_TEST_BUCKET'])
+                origfeed = Feed.fromArchive(feedurl, archive)
+            else
+                origfeed = Feed.fromUrl(feedurl)
+            end
+            Rerun.new(origfeed, startDate, sched_from(params))
         }
     rescue
+        # TODO seeing as this is expected to be a feed, I think it would be more
+        #   appropriate to signal a temporary error status
+        #   Just setting status to 404 triggers the not_found page, which is not
+        #   what I want to do
         return erb :timeout, :locals => {:feed_url => params[:url]}
     end
 
@@ -79,10 +108,11 @@ error do
 end
 
 def sched_from(params)
+    # map the http GET args like '&mon=&tue=&thu=' to a string of ints, 0=Sun
     retstr = ''
     Weekdays.each_with_index do |day, i|
         if params.has_key?(day)
-            retstr += String(i)
+            retstr += i.to_s
         end
     end
     return retstr
@@ -99,4 +129,8 @@ def safe_url(url)
     end
 
     return returl
+end
+
+def whitelisted?(url)
+    return ['http://theamphour.com/feed'].include?(url)
 end
