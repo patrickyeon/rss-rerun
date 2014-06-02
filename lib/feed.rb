@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 require 'nokogiri'
-require 'open-uri'
 require 'aws/s3'
+require_relative 'fetch.rb'
 
 class Feed
     attr_accessor :feed, :items
     
     def self.fromUrl(url)
-        return self.fromResource(open(url).read)
+        return self.fromResource(Fetch.openUrl(url).read)
     end
 
     def self.fromResource(text)
@@ -29,7 +29,7 @@ class Feed
         end
         arcitems = Nokogiri::XML(arc.recall url).xpath('//item')
         # bring in the latest
-        feed, items = self.breakup(open(url).read)
+        feed, items = self.breakup(Fetch.openUrl(url).read)
         updated = false
         guids = arcitems.collect {|item| item.at('guid').content}
         # arc + latest > arc?
@@ -86,7 +86,7 @@ class Archive
     end
 
     def self.fromUrl(url)
-        file = open('http://web.archive.org/web/timemap/link/' + url)
+        file = Fetch.openUrl('http://web.archive.org/web/timemap/link/' + url)
         return Archive.fromResource(file)
     end
 
@@ -111,7 +111,7 @@ class Archive
         items = {}
         guids = []
         links.each do |link|
-            memento = Nokogiri::XML(open(link.keys()[0]))
+            memento = Nokogiri::XML(Fetch.openUrl(link.keys()[0]))
             entries = memento.xpath('//item').reverse
             entries.each do |e|
                 if e.at('guid') == nil
@@ -127,7 +127,7 @@ class Archive
 
         # make a new doc with all the items
         guids = guids.reverse()
-        total = Nokogiri::XML(open(links[0].keys()[0]))
+        total = Nokogiri::XML(Fetch.openUrl(links[0].keys()[0]))
         total.xpath('//item').each do |e|
             e.remove
         end
@@ -289,6 +289,7 @@ class S3Archive < Archive
     end
 
     def cached?(url)
+        url = Fetch.canonicalize url
         # gotta do this to update the bucket
         # TODO is there a better way to handle this?
         @bucket = AWS::S3::Bucket.find(@bucket.name)
@@ -296,16 +297,19 @@ class S3Archive < Archive
     end
 
     def keyfor(url)
+        url = Fetch.canonicalize url
         return Digest::MD5.hexdigest(url)
     end
 
     def update(url, items)
+        url = Fetch.canonicalize url
         AWS::S3::S3Object.store(keyfor(url),
                                 '<xml><url>' + url + '</url>' + items + '</xml>',
                                 @bucket.name)
     end
 
     def recall(url)
+        url = Fetch.canonicalize url
         if not self.cached? url
             return ''
         end
