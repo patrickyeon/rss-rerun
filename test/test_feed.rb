@@ -15,6 +15,13 @@ class FeedUnitTests < Test::Unit::TestCase
         end
     end
 
+    def teardown
+        # make sure none of this bleeds over between tests
+        Fetch.instance.global_sanitize = true
+        Fetch.instance.global_canonicalize = true
+        Fetch.instance.nil_callback
+    end
+
     def posts(feed)
         return Nokogiri::XML(feed).xpath('//item')
     end
@@ -65,6 +72,7 @@ class FeedUnitTests < Test::Unit::TestCase
     end
 
     def test_s3_archive
+        Fetch.instance.global_canonicalize = false
         a = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
                           ENV['AMAZON_SECRET_ACCESS_KEY'],
                           ENV['AMAZON_S3_TEST_BUCKET'])
@@ -77,6 +85,7 @@ class FeedUnitTests < Test::Unit::TestCase
     end
 
     def test_s3_archive_collide
+        Fetch.instance.global_canonicalize = false
         a = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
                           ENV['AMAZON_SECRET_ACCESS_KEY'],
                           ENV['AMAZON_S3_TEST_BUCKET'])

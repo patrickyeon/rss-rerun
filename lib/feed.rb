@@ -289,6 +289,7 @@ class S3Archive < Archive
     end
 
     def cached?(url)
+        url = Fetch.canonicalize url
         # gotta do this to update the bucket
         # TODO is there a better way to handle this?
         @bucket = AWS::S3::Bucket.find(@bucket.name)
@@ -296,16 +297,19 @@ class S3Archive < Archive
     end
 
     def keyfor(url)
+        url = Fetch.canonicalize url
         return Digest::MD5.hexdigest(url)
     end
 
     def update(url, items)
+        url = Fetch.canonicalize url
         AWS::S3::S3Object.store(keyfor(url),
                                 '<xml><url>' + url + '</url>' + items + '</xml>',
                                 @bucket.name)
     end
 
     def recall(url)
+        url = Fetch.canonicalize url
         if not self.cached? url
             return ''
         end
