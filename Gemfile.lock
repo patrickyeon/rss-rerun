@@ -4,6 +4,7 @@ PATH
     rerun (0.0.2)
       aws-s3
       nokogiri
+      pg
       sinatra
 
 GEM
@@ -18,6 +19,7 @@ GEM
     mini_portile (0.6.0)
     nokogiri (1.6.2.1)
       mini_portile (= 0.6.0)
+    pg (0.17.1)
     rack (1.5.2)
     rack-protection (1.5.3)
       rack

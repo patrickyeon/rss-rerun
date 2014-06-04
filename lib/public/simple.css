@@ -23,7 +23,7 @@ body {background-color: #fdf6e3;
 		color: #657b83;}
 h1,h2,h3 {color: #859900;}
 h2 {font-variant: small-caps;}
-em {color: #586e75;}
+em, strong {color: #586e75;}
 
 .feed {display: inline-block;
 		background: #eee8d5;
