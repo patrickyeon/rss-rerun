@@ -41,7 +41,7 @@ get '/preview' do
             if params.has_key?('archive') && whitelisted?(feedurl)
                 archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
                                         ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                        ENV['AMAZON_S3_TEST_BUCKET'])
+                                        ENV['AMAZON_S3_BUCKET'])
                 origfeed = Feed.fromArchive(feedurl, archive)
             else
                 origfeed = Feed.fromUrl(feedurl)
@@ -54,7 +54,7 @@ get '/preview' do
         return erb :timeout, :locals => {:feed_url => feedurl}
     end
 
-    rss_url = 'http://localhost:4567/rerun?url=' +  CGI::escape(feedurl)
+    rss_url = 'rerun?url=' +  CGI::escape(feedurl)
     rss_url += '&startDate=' + (Chrono.now - backdate).strftime('%F')
     schedule.chars {|c| rss_url += '&' + Weekdays[c.to_i]}
     if params.has_key?('archive')
@@ -79,7 +79,7 @@ get '/rerun' do
             if params.has_key?('archive') && whitelisted?(feedurl)
                 archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
                                         ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                        ENV['AMAZON_S3_TEST_BUCKET'])
+                                        ENV['AMAZON_S3_BUCKET'])
                 origfeed = Feed.fromArchive(feedurl, archive)
             else
                 origfeed = Feed.fromUrl(feedurl)
@@ -153,5 +153,6 @@ def safe_url(url)
 end
 
 def whitelisted?(url)
-    return ['http://theamphour.com/feed'].include?(url)
+    # for now it's just the amp hour
+    return /^http:\/\/(www.)?theamphour.com\/feed\/?$/.match(url) != nil
 end
