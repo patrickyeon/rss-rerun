@@ -100,15 +100,11 @@ end
 get '/magic_req' do
     require 'pg'
     db = nil
-    if ENV['DATABASE_URL'] != nil
-        db = PG.connect(ENV['DATABASE_URL'])
-    else
-        db = PG.connect(:host     => ENV['POSTGRES_HOST'],
-                        :port     => 5432,
-                        :dbname   => ENV['POSTGRES_DB_NAME'],
-                        :user     => ENV['POSTGRES_USER'],
-                        :password => ENV['POSTGRES_PASS'])
-    end
+    db = PG.connect(:host     => ENV['POSTGRES_HOST'],
+                    :port     => 5432,
+                    :dbname   => ENV['POSTGRES_DB_NAME'],
+                    :user     => ENV['POSTGRES_USER'],
+                    :password => ENV['POSTGRES_PASS'])
     db.exec_params("INSERT INTO requests (email, url, type, tstamp, noisy)
                     VALUES ($1, $2, $3, 'now', $4)",
                    [params[:contact], params['request_url'], 'archive',
