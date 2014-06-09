@@ -81,9 +81,8 @@ class Archive
         if @bucket.objects.with_prefix(key).count == 0
             return false
         end
-        return true
-        # for later
-        # return @bucket[key + '/info.txt'].read == url
+        # as a matter of fact, no, collisions aren't handled well
+        return @bucket.objects[key + '/info.txt'].read == url
     end
 
     def keyfor(url)
@@ -93,8 +92,13 @@ class Archive
 
     def update(url, items)
         url = Fetch.canonicalize url
-        @bucket.objects[keyfor(url)].write('<xml><url>' + url + '</url>' +
-                                           items + '</xml>')
+        # for now, it just totally clobbers the archive
+        @bucket.objects.with_prefix(keyfor(url)).each do |o|
+            o.delete
+        end
+
+        @bucket.objects[keyfor(url) + '/info.txt'].write(url)
+        @bucket.objects[keyfor(url) + '/items'].write('<xml>%s</xml>' % items)
     end
 
     def recall(url, loc=nil)
@@ -102,13 +106,7 @@ class Archive
             # for backwards compatability
             return rcl(url)
         end
-
-        url = Fetch.canonicalize url
-        if not self.cached? url
-            return ''
-        end
-
-
+        raise NotImplementedError
     end
 
     def rcl(url)
@@ -117,13 +115,7 @@ class Archive
             return ''
         end
         
-        items = @bucket.objects[keyfor(url)].read
-        if not items.start_with?('<xml><url>' + url + '</url>')
-            # as a matter of fact, no, collisions aren't handled well
-            return ''
-        end
-        
-        return items
+        return @bucket.objects[keyfor(url) + '/items'].read
     end
 
     def create(url)

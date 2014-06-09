@@ -69,7 +69,6 @@ class FeedUnitTests < Test::Unit::TestCase
         assert a.cached?(url)
         stored = Nokogiri::XML(a.recall(url))
         assert_equal 8, stored.xpath('//item').length
-        assert_equal url, stored.at('url').content
     end
 
     def test_s3_archive_collide
