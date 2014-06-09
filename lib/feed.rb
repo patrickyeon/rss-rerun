@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'nokogiri'
-require 'aws/s3'
+require 'aws-sdk'
 require_relative 'fetch.rb'
 
 class Feed
@@ -70,17 +70,20 @@ end
 class Archive
     # TODO all the error conditions
     def initialize(id, secret, bucket)
-        AWS::S3::Base.establish_connection!(:access_key_id => id,
-                                            :secret_access_key => secret)
-        @bucket = AWS::S3::Bucket.find(bucket)
+        @sess = AWS::S3.new(:access_key_id => id,
+                            :secret_access_key => secret)
+        @bucket = @sess.buckets[bucket]
     end
 
     def cached?(url)
         url = Fetch.canonicalize url
-        # gotta do this to update the bucket
-        # TODO is there a better way to handle this?
-        @bucket = AWS::S3::Bucket.find(@bucket.name)
-        return nil != @bucket[keyfor(url)]
+        key = keyfor url
+        if @bucket.objects.with_prefix(key).count == 0
+            return false
+        end
+        return true
+        # for later
+        # return @bucket[key + '/info.txt'].read == url
     end
 
     def keyfor(url)
@@ -90,18 +93,31 @@ class Archive
 
     def update(url, items)
         url = Fetch.canonicalize url
-        AWS::S3::S3Object.store(keyfor(url),
-                                '<xml><url>' + url + '</url>' + items + '</xml>',
-                                @bucket.name)
+        @bucket.objects[keyfor(url)].write('<xml><url>' + url + '</url>' +
+                                           items + '</xml>')
     end
 
-    def recall(url)
+    def recall(url, loc=nil)
+        if loc == nil
+            # for backwards compatability
+            return rcl(url)
+        end
+
+        url = Fetch.canonicalize url
+        if not self.cached? url
+            return ''
+        end
+
+
+    end
+
+    def rcl(url)
         url = Fetch.canonicalize url
         if not self.cached? url
             return ''
         end
         
-        items = @bucket[keyfor(url)].value
+        items = @bucket.objects[keyfor(url)].read
         if not items.start_with?('<xml><url>' + url + '</url>')
             # as a matter of fact, no, collisions aren't handled well
             return ''
