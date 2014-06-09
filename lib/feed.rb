@@ -68,14 +68,46 @@ class MementoParsingError < StandardError
 end
 
 class Archive
+    # TODO all the error conditions
+    def initialize(id, secret, bucket)
+        AWS::S3::Base.establish_connection!(:access_key_id => id,
+                                            :secret_access_key => secret)
+        @bucket = AWS::S3::Bucket.find(bucket)
+    end
+
     def cached?(url)
-        raise NotImplementedError
+        url = Fetch.canonicalize url
+        # gotta do this to update the bucket
+        # TODO is there a better way to handle this?
+        @bucket = AWS::S3::Bucket.find(@bucket.name)
+        return nil != @bucket[keyfor(url)]
     end
+
+    def keyfor(url)
+        url = Fetch.canonicalize url
+        return Digest::MD5.hexdigest(url)
+    end
+
     def update(url, items)
-        raise NotImplementedError
+        url = Fetch.canonicalize url
+        AWS::S3::S3Object.store(keyfor(url),
+                                '<xml><url>' + url + '</url>' + items + '</xml>',
+                                @bucket.name)
     end
+
     def recall(url)
-        raise NotImplementedError
+        url = Fetch.canonicalize url
+        if not self.cached? url
+            return ''
+        end
+        
+        items = @bucket[keyfor(url)].value
+        if not items.start_with?('<xml><url>' + url + '</url>')
+            # as a matter of fact, no, collisions aren't handled well
+            return ''
+        end
+        
+        return items
     end
 
     def create(url)
@@ -235,91 +267,4 @@ class Archive
         return retval
     end
 
-end
-
-class LocalArchive < Archive
-    def initialize(dir)
-        if not dir.end_with?('/')
-            dir.concat('/')
-        end
-        @dir = dir
-        f = File.open(dir + 'index')
-        @index = Marshal::load(f)
-        f.close
-        @maxIdx = @index.values.sort[-1] || 0
-    end
-
-    def cached?(url)
-        return @index.has_key? url
-    end
-
-    def update(url, items)
-        # items are stored ordered oldest to newest
-        # FIXME not safe for multi-process
-        if not @index.has_key? url
-            @maxIdx += 1
-            @index[url] = @maxIdx
-            idx = File.open(@dir + 'index', 'w')
-            idx.print(Marshal::dump(@index))
-            idx.close
-        end
-        f = File.open('%s%d' % [@dir, @maxIdx], 'w')
-        f.print('<xml>' + items + '</xml>')
-        f.close
-    end
-
-    def recall(url)
-        if not self.cached? url
-            return ''
-        end
-
-        f = File.open('%s%d' % [@dir, @index[url]])
-        items = f.read
-        f.close
-        return items
-    end
-end
-
-class S3Archive < Archive
-    # TODO all the error conditions
-    def initialize(id, secret, bucket)
-        AWS::S3::Base.establish_connection!(:access_key_id => id,
-                                            :secret_access_key => secret)
-        @bucket = AWS::S3::Bucket.find(bucket)
-    end
-
-    def cached?(url)
-        url = Fetch.canonicalize url
-        # gotta do this to update the bucket
-        # TODO is there a better way to handle this?
-        @bucket = AWS::S3::Bucket.find(@bucket.name)
-        return nil != @bucket[keyfor(url)]
-    end
-
-    def keyfor(url)
-        url = Fetch.canonicalize url
-        return Digest::MD5.hexdigest(url)
-    end
-
-    def update(url, items)
-        url = Fetch.canonicalize url
-        AWS::S3::S3Object.store(keyfor(url),
-                                '<xml><url>' + url + '</url>' + items + '</xml>',
-                                @bucket.name)
-    end
-
-    def recall(url)
-        url = Fetch.canonicalize url
-        if not self.cached? url
-            return ''
-        end
-        
-        items = @bucket[keyfor(url)].value
-        if not items.start_with?('<xml><url>' + url + '</url>')
-            # as a matter of fact, no, collisions aren't handled well
-            return ''
-        end
-        
-        return items
-    end
 end

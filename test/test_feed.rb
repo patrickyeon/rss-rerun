@@ -28,7 +28,7 @@ class FeedUnitTests < Test::Unit::TestCase
 
     def test_from_mementos
         Fetch.instance.global_sanitize = false
-        feed = LocalArchive.fromResource(File.open('test/data/timemap'))
+        feed = Archive.fromResource(File.open('test/data/timemap'))
         Fetch.instance.global_sanitize = true
         items = posts(feed)
         assert_equal 8, items.length
@@ -45,23 +45,11 @@ class FeedUnitTests < Test::Unit::TestCase
         assert_equal Array(1..5).reverse, guids
     end
 
-    def test_local_archive
-        f = File.open('test/temp/db/index', 'w')
-        f.print(Marshal::dump({}))
-        f.close
-        a = LocalArchive.new('test/temp/db')
-
-        url = 'test/data/original'
-        a.create(url)
-        assert a.cached?(url)
-        assert_equal 8, Nokogiri::XML(a.recall(url)).xpath('//item').length
-    end
-
-    def test_total_local_archive
-        f = File.open('test/temp/db/index', 'w')
-        f.print(Marshal::dump({}))
-        f.close
-        a = LocalArchive.new('test/temp/db')
+    def test_total_archive
+        Fetch.instance.global_canonicalize = false
+        a = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                        ENV['AMAZON_SECRET_ACCESS_KEY'],
+                        ENV['AMAZON_S3_TEST_BUCKET'])
         
         url = 'test/data/original'
         a.create(url)
@@ -73,9 +61,9 @@ class FeedUnitTests < Test::Unit::TestCase
 
     def test_s3_archive
         Fetch.instance.global_canonicalize = false
-        a = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                          ENV['AMAZON_SECRET_ACCESS_KEY'],
-                          ENV['AMAZON_S3_TEST_BUCKET'])
+        a = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                        ENV['AMAZON_SECRET_ACCESS_KEY'],
+                        ENV['AMAZON_S3_TEST_BUCKET'])
         url = 'test/data/original'
         a.create url
         assert a.cached?(url)
@@ -86,9 +74,9 @@ class FeedUnitTests < Test::Unit::TestCase
 
     def test_s3_archive_collide
         Fetch.instance.global_canonicalize = false
-        a = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                          ENV['AMAZON_SECRET_ACCESS_KEY'],
-                          ENV['AMAZON_S3_TEST_BUCKET'])
+        a = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                        ENV['AMAZON_SECRET_ACCESS_KEY'],
+                        ENV['AMAZON_S3_TEST_BUCKET'])
         def a.keyfor(url)
             return 'collide'
         end

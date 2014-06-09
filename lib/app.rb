@@ -39,9 +39,9 @@ get '/preview' do
             # timeout arbitrarily chosen
             # TODO fire off creating a new archive to another process
             if params.has_key?('archive') && whitelisted?(feedurl)
-                archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                        ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                        ENV['AMAZON_S3_BUCKET'])
+                archive = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                      ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                      ENV['AMAZON_S3_BUCKET'])
                 origfeed = Feed.fromArchive(feedurl, archive)
             else
                 origfeed = Feed.fromUrl(feedurl)
@@ -77,9 +77,9 @@ get '/rerun' do
         feedurl = safe_url(params[:url])
         feed = Timeout::timeout(35) {
             if params.has_key?('archive') && whitelisted?(feedurl)
-                archive = S3Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                        ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                        ENV['AMAZON_S3_BUCKET'])
+                archive = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                      ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                      ENV['AMAZON_S3_BUCKET'])
                 origfeed = Feed.fromArchive(feedurl, archive)
             else
                 origfeed = Feed.fromUrl(feedurl)
