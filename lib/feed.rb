@@ -40,7 +40,7 @@ class Feed
             end
         end
         if updated
-            arc.update(url, arcitems.to_xml)
+            arc.update(url, arcitems)
         end
 
         return self.new(feed, arcitems)
@@ -91,6 +91,8 @@ class Archive
     end
 
     def update(url, items)
+        # items must be array-like, in chronological order, and slices of items
+        #  must have a :to_xml method
         url = Fetch.canonicalize url
         # for now, it just totally clobbers the archive
         @bucket.objects.with_prefix(keyfor(url)).each do |o|
@@ -98,13 +100,16 @@ class Archive
         end
 
         @bucket.objects[keyfor(url) + '/info.txt'].write(url)
-        @bucket.objects[keyfor(url) + '/items'].write('<xml>%s</xml>' % items)
+        (0..(items.length / 25)).each do |i|
+            bin = @bucket.objects[keyfor(url) + ('/%d.items' % i)]
+            bin.write(items[25 * i, 25].to_xml)
+        end
     end
 
     def recall(url, loc=nil)
         if loc == nil
             # for backwards compatability
-            return rcl(url)
+            return '<items>%s</items>' % rcl(url)
         end
         raise NotImplementedError
     end
@@ -115,13 +120,17 @@ class Archive
             return ''
         end
         
-        return @bucket.objects[keyfor(url) + '/items'].read
+        bins = []
+        @bucket.objects.with_prefix(keyfor(url)).each {|o| bins.push o}
+        bins.keep_if {|o| o.key.end_with?('.items')}
+        bins.sort_by! {|o| Integer(/\/0*([0-9]+)/.match(o.key)[1])}
+        return bins.collect{|o| o.read}.join("\n")
     end
 
     def create(url)
         feed = Archive.fromUrl(url)
         # TODO avoid jumping back and forth through Nokogiri
-        items = Nokogiri::XML(feed).xpath('//item').reverse.to_xml
+        items = Nokogiri::XML(feed).xpath('//item').reverse
         self.update(url, items)
     end
 

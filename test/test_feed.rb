@@ -81,6 +81,8 @@ class FeedUnitTests < Test::Unit::TestCase
         end
         url = 'test/data/original'
         a.create(url)
-        assert_equal '', a.recall('foobar')
+        # this fetch will collide, but it should not return any items.
+        stored = Nokogiri::XML(a.recall('foobar'))
+        assert_equal 0, stored.xpath('//item').length
     end
 end
