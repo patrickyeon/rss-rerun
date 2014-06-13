@@ -90,14 +90,21 @@ end
 class LargeFeedUnitTests < Test::Unit::TestCase
     def setup
         # use a local timemap instead of hitting the archive.org servers
-        def Archive.fromUrl(url)
-            cb = lambda do |url|
-                return File.open(url[7..-1])
+        def Archive.fromUrl(u)
+            cb = lambda do |u|
+                return File.open(u[7..-1])
             end
             Fetch.instance.set_callback(&cb)
             return Archive.fromResource(File.open('test/data/puppies.timemap'))
             Fetch.instance.nil_callback
         end
+
+        Fetch.instance.global_canonicalize = false
+        @arc = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                           ENV['AMAZON_SECRET_ACCESS_KEY'],
+                           ENV['AMAZON_S3_TEST_BUCKET'])
+        @url = 'test/data/puppies.rss'
+        @arc.create @url
     end
 
     def min(a, b)
@@ -109,16 +116,19 @@ class LargeFeedUnitTests < Test::Unit::TestCase
     end
 
     def test_limited_recall
-        Fetch.instance.global_canonicalize = false
-        a = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                        ENV['AMAZON_SECRET_ACCESS_KEY'],
-                        ENV['AMAZON_S3_TEST_BUCKET'])
-        url = 'test/data/puppies.rss'
-        a.create url
-        Array(1..101).reverse_each do |i|
-            # TODO also check that each call produces the correct 25
-            stored = Nokogiri::XML(a.recall(url, i))
-            assert_equal min(i, 25), stored.xpath('//item').length
+        Array(1..101).each do |i|
+            stored = Nokogiri::XML(@arc.recall(@url, i)).xpath('//item')
+            assert_equal min(i, 25), stored.length
+            assert_equal i, Integer(stored[-1].at('guid').content[3..-1])
         end
     end
+
+    def test_recall_past_end
+        [102, 103, 104, 124, 125, 126, 149, 150, 151, 152].each do |i|
+            stored = Nokogiri::XML(@arc.recall(@url, i)).xpath('//item')
+            assert_equal 25, stored.length
+            assert_equal 101, Integer(stored[-1].at('guid').content[3..-1])
+        end
+    end
+
 end

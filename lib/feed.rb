@@ -40,9 +40,11 @@ class Feed
                 updated = true
             end
         end
-        if updated
-            arc.update(url, arcitems)
-        end
+        # FIXME store new items in the archive. Right now, this will clobber
+        #        the current archive.
+        #if updated
+        #    arc.update(url, arcitems)
+        #end
 
         return self.new(feed, arcitems)
     end
@@ -114,12 +116,23 @@ class Archive
             # for backwards compatability
             return '<items>%s</items>' % rcl(url)
         end
+
+        info = JSON.parse(@bucket.objects[keyfor(url) + '/info.txt'].read)
+        if loc > info['item_count']
+            # if they ask past the recent end of the archive, just give 'em the
+            #  most recent 25 items
+            return recall url, info['item_count']
+        end
+
         bins = []
         @bucket.objects.with_prefix(keyfor(url)).each {|o| bins.push o}
         bins.keep_if {|o| o.key.end_with?('.items')}
         bins.sort_by! {|o| Integer(/\/0*([0-9]+)/.match(o.key)[1])}
         contained = loc / 25
         if contained == 0
+            # special case, we would return up to 25 items, but the requester
+            #  is asking for something so early that there aren't 24 previous
+            #  items to give them.
             items = bins[0].read
             items = Nokogiri::XML('<x>%s</x>' % items).xpath('//item')
             items = items[0, loc]
