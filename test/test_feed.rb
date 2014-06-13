@@ -86,3 +86,39 @@ class FeedUnitTests < Test::Unit::TestCase
         assert_equal 0, stored.xpath('//item').length
     end
 end
+
+class LargeFeedUnitTests < Test::Unit::TestCase
+    def setup
+        # use a local timemap instead of hitting the archive.org servers
+        def Archive.fromUrl(url)
+            cb = lambda do |url|
+                return File.open(url[7..-1])
+            end
+            Fetch.instance.set_callback(&cb)
+            return Archive.fromResource(File.open('test/data/puppies.timemap'))
+            Fetch.instance.nil_callback
+        end
+    end
+
+    def min(a, b)
+        if a < b
+            return a
+        else
+            return b
+        end
+    end
+
+    def test_limited_recall
+        Fetch.instance.global_canonicalize = false
+        a = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                        ENV['AMAZON_SECRET_ACCESS_KEY'],
+                        ENV['AMAZON_S3_TEST_BUCKET'])
+        url = 'test/data/puppies.rss'
+        a.create url
+        Array(1..101).reverse_each do |i|
+            # TODO also check that each call produces the correct 25
+            stored = Nokogiri::XML(a.recall(url, i))
+            assert_equal min(i, 25), stored.xpath('//item').length
+        end
+    end
+end

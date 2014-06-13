@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'nokogiri'
 require 'aws-sdk'
+require 'json'
 require_relative 'fetch.rb'
 
 class Feed
@@ -82,7 +83,8 @@ class Archive
             return false
         end
         # as a matter of fact, no, collisions aren't handled well
-        return @bucket.objects[key + '/info.txt'].read == url
+        info = JSON.parse(@bucket.objects[key + '/info.txt'].read)
+        return info['url'] == url
     end
 
     def keyfor(url)
@@ -99,7 +101,8 @@ class Archive
             o.delete
         end
 
-        @bucket.objects[keyfor(url) + '/info.txt'].write(url)
+        info = {'url' => url, 'item_count' => items.length}
+        @bucket.objects[keyfor(url) + '/info.txt'].write(info.to_json)
         (0..(items.length / 25)).each do |i|
             bin = @bucket.objects[keyfor(url) + ('/%d.items' % i)]
             bin.write(items[25 * i, 25].to_xml)
@@ -111,7 +114,22 @@ class Archive
             # for backwards compatability
             return '<items>%s</items>' % rcl(url)
         end
-        raise NotImplementedError
+        bins = []
+        @bucket.objects.with_prefix(keyfor(url)).each {|o| bins.push o}
+        bins.keep_if {|o| o.key.end_with?('.items')}
+        bins.sort_by! {|o| Integer(/\/0*([0-9]+)/.match(o.key)[1])}
+        contained = loc / 25
+        if contained == 0
+            items = bins[0].read
+            items = Nokogiri::XML('<x>%s</x>' % items).xpath('//item')
+            items = items[0, loc]
+        else
+            items = bins[contained-1].read
+            items << bins[contained].read
+            items = Nokogiri::XML('<x>%s</x>' % items).xpath('//item')
+            items = items[loc % 25, 25]
+        end
+        return '<items>%s</items>' % items.to_xml
     end
 
     def rcl(url)
