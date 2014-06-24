@@ -4,66 +4,44 @@ require 'aws-sdk'
 require 'json'
 require_relative 'fetch.rb'
 
+# Assumptions for this file:
+#  o Unless otherwise stated, urls passed to any methods here are safe
+#     (sanitized) but not necessarily canonicalized
+# TODO make sure that's true
+
 class Feed
-    attr_accessor :feed, :items
-    
-    def self.fromUrl(url)
-        return self.fromResource(Fetch.openUrl(url).read)
-    end
+    attr_accessor :chan
 
-    def self.fromResource(text)
-        feed, items = self.breakup(text)
-        return self.new(feed, items)
-    end
-
-    def self.breakup(text)
-        feed = Nokogiri::XML(text)
-        items = feed.xpath('//item').reverse
-        items.collect {|item| item.remove}
-        return [feed, items]
-    end
-
-    def self.fromArchive(url, arc)
-        # check if we've got an archived version
+    def initialize(url, arc)
+        # arc is the Archive that stores the history for the url
         if not arc.cached? url
-            arc.create url
+            raise StandardError 'Feed not archived'
         end
-        arcitems = Nokogiri::XML(arc.recall url).xpath('//item')
-        # bring in the latest
-        feed, items = self.breakup(Fetch.openUrl(url).read)
-        updated = false
-        guids = arcitems.collect {|item| item.at('guid').content}
-        # arc + latest > arc?
-        items.each do |item|
-            if not guids.include? item.at('guid').content
-                arcitems.push item
-                updated = true
-            end
-        end
-        # FIXME store new items in the archive. Right now, this will clobber
-        #        the current archive.
-        #if updated
-        #    arc.update(url, arcitems)
-        #end
 
-        return self.new(feed, arcitems)
+        @url = url
+        @arc = arc
+
+        feed = Nokogiri::XML(Fetch.openUrl(url).read)
+        items = feed.xpath('//item')
+        items.each {|item| item.remove}
+
+        recent_items = Nokogiri::XML(@arc.recall(url, -1)).xpath('//item')
+        recent_guid = recent_items[-1].at('guid').content
+        new_guids = items.collect {|item| item.at('guid').content}
+        cutoff = new_guids.index(recent_guid)
+        if cutoff == nil
+            cutoff = new_guids.length
+        end
+        if cutoff > 0
+            @arc.update(url, items[0, cutoff])
+        end
+
+        @chan = feed
     end
 
-    def initialize(emptyfeed, items)
-        # items must be ordered oldest to newest
-        @feed = emptyfeed
-        @items = items
+    def recall(loc)
+        return @arc.recall(@url, loc)
     end
-
-    def to_xml
-        retval = @feed.clone
-        chan = retval.at('channel')
-        @items.reverse.each do |item|
-            chan.add_child item
-        end
-        return retval.to_xml
-    end
-
 end
 
 class MementoParsingError < StandardError
@@ -89,38 +67,32 @@ class Archive
         return info['url'] == url
     end
 
+    def info(url)
+        # TODO some local caching or something to not hit S3 so often
+        url = Fetch.canonicalize url
+        if not self.cached? url
+            return nil
+        end
+
+        return JSON.parse(@bucket.objects[keyfor(url) + '/info.txt'].read)
+    end
+
     def keyfor(url)
         url = Fetch.canonicalize url
         return Digest::MD5.hexdigest(url)
     end
 
-    def update(url, items)
-        # items must be array-like, in chronological order, and slices of items
-        #  must have a :to_xml method
-        url = Fetch.canonicalize url
-        # for now, it just totally clobbers the archive
-        @bucket.objects.with_prefix(keyfor(url)).each do |o|
-            o.delete
+    def recall(url, loc)
+        info = self.info(url)
+        if info == nil
+            # that's how we handle collisions for now
+            return ''
         end
 
-        info = {'url' => url, 'item_count' => items.length}
-        @bucket.objects[keyfor(url) + '/info.txt'].write(info.to_json)
-        (0..(items.length / 25)).each do |i|
-            bin = @bucket.objects[keyfor(url) + ('/%d.items' % i)]
-            bin.write(items[25 * i, 25].to_xml)
-        end
-    end
-
-    def recall(url, loc=nil)
-        if loc == nil
-            # for backwards compatability
-            return '<items>%s</items>' % rcl(url)
-        end
-
-        info = JSON.parse(@bucket.objects[keyfor(url) + '/info.txt'].read)
-        if loc > info['item_count']
+        if loc > info['item_count'] || loc < 0
             # if they ask past the recent end of the archive, just give 'em the
             #  most recent 25 items
+            # negative location is taken to mean "most recent 25"
             return recall url, info['item_count']
         end
 
@@ -145,25 +117,48 @@ class Archive
         return '<items>%s</items>' % items.to_xml
     end
 
-    def rcl(url)
-        url = Fetch.canonicalize url
-        if not self.cached? url
-            return ''
-        end
-        
-        bins = []
-        @bucket.objects.with_prefix(keyfor(url)).each {|o| bins.push o}
-        bins.keep_if {|o| o.key.end_with?('.items')}
-        bins.sort_by! {|o| Integer(/\/0*([0-9]+)/.match(o.key)[1])}
-        return bins.collect{|o| o.read}.join("\n")
-    end
-
     def create(url)
         feed = Archive.fromUrl(url)
         # TODO avoid jumping back and forth through Nokogiri
         items = Nokogiri::XML(feed).xpath('//item').reverse
-        self.update(url, items)
+
+        # for now, just totally clobber anything that was already there
+        @bucket.objects.with_prefix(keyfor(url)).each do |o|
+            o.delete
+        end
+
+        info = {'url' => url, 'item_count' => items.length}
+        @bucket.objects[keyfor(url) + '/info.txt'].write(info.to_json)
+        (0..(items.length / 25)).each do |i|
+            bin = @bucket.objects[keyfor(url) + ('/%d.items' % i)]
+            bin.write(items[25 * i, 25].to_xml)
+        end
     end
+
+    def update(url, items)
+        items = items.reverse
+        info = self.info(url)
+        binkey = keyfor(url) + '/%d.items'
+        last_bin = info['item_count'] / 25
+        fill = 25 - (info['item_count'] % 25)
+        info['item_count'] = info['item_count'] + items.length
+        if fill != 25
+            bin = @bucket.objects[binkey % last_bin].read
+            bin << items[0, fill].to_xml
+            @bucket.objects[binkey % last_bin].write(bin)
+        end
+
+        items = items[fill..-1]
+        while items != nil && items.length > 0 do
+            last_bin += 1
+            bin = @bucket.objects[binkey % lastbin]
+            bin.write(items[0, 25].to_xml)
+            items = items[25..-1]
+        end
+
+        @bucket.objects[keyfor(url) + '/info.txt'].write(info.to_json)
+    end
+
 
     def self.fromUrl(url)
         file = Fetch.openUrl('http://web.archive.org/web/timemap/link/' + url)

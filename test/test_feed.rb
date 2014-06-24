@@ -36,15 +36,6 @@ class FeedUnitTests < Test::Unit::TestCase
         assert_equal Array(1..8).reverse, guids
     end
 
-    def test_create_feed
-        Fetch.instance.global_sanitize = false
-        f = Feed.fromUrl('test/data/mem2')
-        Fetch.instance.global_sanitize = true
-        items = posts(f.to_xml)
-        guids = items.collect {|item| Integer(item.at('guid').content)}
-        assert_equal Array(1..5).reverse, guids
-    end
-
     def test_total_archive
         Fetch.instance.global_canonicalize = false
         a = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
@@ -53,9 +44,9 @@ class FeedUnitTests < Test::Unit::TestCase
         
         url = 'test/data/original'
         a.create(url)
-        feed = Feed.fromArchive(url, a)
-        assert_equal 10, feed.items.length
-        guids = feed.items.collect {|item| Integer(item.at('guid').content)}
+        items = Nokogiri::XML(Feed.new(url, a).recall(-1)).xpath('//item')
+        assert_equal 10, items.length
+        guids = items.collect {|item| Integer(item.at('guid').content)}
         assert_equal Array(1..10), guids
     end
 
@@ -67,7 +58,7 @@ class FeedUnitTests < Test::Unit::TestCase
         url = 'test/data/original'
         a.create url
         assert a.cached?(url)
-        stored = Nokogiri::XML(a.recall(url))
+        stored = Nokogiri::XML(a.recall(url, -1))
         assert_equal 8, stored.xpath('//item').length
     end
 
@@ -82,7 +73,7 @@ class FeedUnitTests < Test::Unit::TestCase
         url = 'test/data/original'
         a.create(url)
         # this fetch will collide, but it should not return any items.
-        stored = Nokogiri::XML(a.recall('foobar'))
+        stored = Nokogiri::XML(a.recall('foobar', -1))
         assert_equal 0, stored.xpath('//item').length
     end
 end
