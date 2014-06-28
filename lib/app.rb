@@ -6,9 +6,12 @@ require 'erb'
 require 'cgi'
 
 Weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+DEBUG = true
 
 configure do
-    disable :show_exceptions
+    unless DEBUG
+        disable :show_exceptions
+    end
 end
 
 get '/' do
@@ -18,6 +21,11 @@ end
 get '/preview' do
     if params[:url] == nil
         redirect to('/'), 302
+    end
+
+    feedurl = safe_url(params[:url])
+    unless whitelisted?(feedurl)
+        return erb :request, :locals => {:feed_url => feedurl}
     end
 
     backdate = 0
@@ -32,23 +40,20 @@ get '/preview' do
     end
 
     schedule = sched_from(params)
-    feedurl = safe_url(params[:url])
 
     begin
         feed = Timeout::timeout(35) {
             # timeout arbitrarily chosen
-            # TODO fire off creating a new archive to another process
-            if params.has_key?('archive') && whitelisted?(feedurl)
-                archive = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                      ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                      ENV['AMAZON_S3_BUCKET'])
-                origfeed = Feed.fromArchive(feedurl, archive)
-            else
-                origfeed = Feed.fromUrl(feedurl)
-            end
+            archive = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                  ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                  ENV['AMAZON_S3_BUCKET'])
+            origfeed = Feed.new(feedurl, archive)
             Rerun.new(origfeed, Chrono.now - backdate, schedule)
         }
-    rescue
+    rescue Exception => e
+        if DEBUG
+            raise e
+        end
         # error out, made for timeouts but will also get triggered for eg. 404
         # TODO something should really be done about a status code
         return erb :timeout, :locals => {:feed_url => feedurl}
@@ -66,6 +71,11 @@ get '/preview' do
 end
 
 get '/rerun' do
+    feedurl = safe_url(params[:url])
+    unless whitelisted?(feedurl)
+        return erb :request, :locals => {:feed_url => feedurl}
+    end
+
     startDate = nil
     begin
         startDate = DateTime.parse(params[:startDate])
@@ -74,19 +84,17 @@ get '/rerun' do
     end
 
     begin
-        feedurl = safe_url(params[:url])
         feed = Timeout::timeout(35) {
-            if params.has_key?('archive') && whitelisted?(feedurl)
-                archive = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                      ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                      ENV['AMAZON_S3_BUCKET'])
-                origfeed = Feed.fromArchive(feedurl, archive)
-            else
-                origfeed = Feed.fromUrl(feedurl)
-            end
+            archive = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                  ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                  ENV['AMAZON_S3_BUCKET'])
+            origfeed = Feed.new(feedurl, archive)
             Rerun.new(origfeed, startDate, sched_from(params))
         }
-    rescue
+    rescue Exception => e
+        if DEBUG
+            raise e
+        end
         # TODO seeing as this is expected to be a feed, I think it would be more
         #   appropriate to signal a temporary error status
         #   Just setting status to 404 triggers the not_found page, which is not

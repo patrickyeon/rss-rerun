@@ -54,27 +54,39 @@ class Archive
         @sess = AWS::S3.new(:access_key_id => id,
                             :secret_access_key => secret)
         @bucket = @sess.buckets[bucket]
+        @recently_cached = []
+        @info = {}
     end
 
     def cached?(url)
         url = Fetch.canonicalize url
         key = keyfor url
+        if @recently_cached.include? key
+            return true
+        end
         if @bucket.objects.with_prefix(key).count == 0
             return false
         end
         # as a matter of fact, no, collisions aren't handled well
         info = JSON.parse(@bucket.objects[key + '/info.txt'].read)
-        return info['url'] == url
+        if info['url'] == url
+            @recently_cached.push key
+            return true
+        end
+        return false
     end
 
     def info(url)
-        # TODO some local caching or something to not hit S3 so often
         url = Fetch.canonicalize url
         if not self.cached? url
             return nil
         end
 
-        return JSON.parse(@bucket.objects[keyfor(url) + '/info.txt'].read)
+        if @info[keyfor(url)] == nil
+            @info[keyfor(url)] = JSON.parse(@bucket.objects[keyfor(url) + '/info.txt'].read)
+        end
+        return @info[keyfor(url)]
+
     end
 
     def keyfor(url)
@@ -128,10 +140,11 @@ class Archive
         end
 
         info = {'url' => url, 'item_count' => items.length}
+        @info[keyfor(url)] = nil
         @bucket.objects[keyfor(url) + '/info.txt'].write(info.to_json)
         (0..(items.length / 25)).each do |i|
             bin = @bucket.objects[keyfor(url) + ('/%d.items' % i)]
-            bin.write(items[25 * i, 25].to_xml)
+            bin.write(items[25 * i, 25].to_xml.force_encoding('UTF-8'))
         end
     end
 
@@ -140,22 +153,27 @@ class Archive
         info = self.info(url)
         binkey = keyfor(url) + '/%d.items'
         last_bin = info['item_count'] / 25
+        # FIXME this is a nasty hack
+        if info['item_count'] == 0
+            last_bin = -1
+        end
         fill = 25 - (info['item_count'] % 25)
         info['item_count'] = info['item_count'] + items.length
         if fill != 25
-            bin = @bucket.objects[binkey % last_bin].read
-            bin << items[0, fill].to_xml
+            bin = @bucket.objects[binkey % last_bin].read.force_encoding('UTF-8')
+            bin << items[0, fill].to_xml.force_encoding('UTF-8')
             @bucket.objects[binkey % last_bin].write(bin)
+            items = items[fill..-1]
         end
 
-        items = items[fill..-1]
         while items != nil && items.length > 0 do
             last_bin += 1
-            bin = @bucket.objects[binkey % lastbin]
-            bin.write(items[0, 25].to_xml)
+            bin = @bucket.objects[binkey % last_bin]
+            bin.write(items[0, 25].to_xml.force_encoding('UTF-8'))
             items = items[25..-1]
         end
 
+        @info[keyfor(url)] = nil
         @bucket.objects[keyfor(url) + '/info.txt'].write(info.to_json)
     end
 
