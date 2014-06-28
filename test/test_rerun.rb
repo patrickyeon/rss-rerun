@@ -1,6 +1,7 @@
 require_relative '../lib/rerun.rb'
 require_relative '../lib/feed.rb'
 require_relative '../lib/chrono.rb'
+require_relative '../lib/fetch.rb'
 require 'test/unit'
 require 'nokogiri'
 
@@ -9,39 +10,27 @@ class RerunUnitTests < Test::Unit::TestCase
     def setup
         # arbitrarily, pretend it's Apr 20, 2014 (a Sunday)
         Chrono.instance.set_now DateTime.parse('Sun, Apr 20 2014')
-
-        # build a simple document
-        @doc = Nokogiri::XML::Document.parse('''<?xml version="1.0"?>
-                                             <rss version="2.0">
-                                             </rss></xml>''')
-        def addnode(where, name, content=nil)
-            elt = Nokogiri::XML::Node.new name, @doc
-            if content != nil
-                elt.content = content
-            end
-            where.add_child elt
-            return elt
-        end
-
-        chan = addnode @doc.at('rss'), 'channel'
-        addnode chan, 'title', 'Test RSS feed with ten items'
-        addnode chan, 'link', 'http://example.com/ten-items'
-        addnode chan, 'description', 'A well-behaved feed with ten items.'
-
-        startDate = DateTime.parse '26 Mar 2014 14:00 GMT'
-
-        for i in (1..10).reverse_each
-            item = addnode chan, 'item'
-            addnode item, 'title', ('Item ' << i.to_s)
-            addnode item, 'link', ('http://example.com/feed/' << i.to_s)
-            addnode item, 'pubDate', (startDate + i).rfc822
-            addnode item, 'description', 'foo'
-        end
+        @arc = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                           ENV['AMAZON_SECRET_ACCESS_KEY'],
+                           ENV['AMAZON_S3_TEST_BUCKET'])
     end
 
     def test_mwf
+        # use a local timemap instead of hitting the archive.org servers
+        def Archive.fromUrl(url)
+            cb = lambda do |url|
+                return File.open(url[7..-1])
+            end
+            Fetch.instance.set_callback(&cb)
+            return Archive.fromResource(File.open('test/data/simple.timemap'))
+            Fetch.instance.nil_callback
+        end
+        Fetch.instance.global_canonicalize = false
+        url = 'test/data/simple.rss'
+        @arc.create(url)
+
         # check that a MWF schedule which should have 5 items works
-        feed = Feed.fromResource(@doc.to_xml)
+        feed = Feed.new(url, @arc)
         r = Rerun.new(feed, startTime = Chrono.now - 12, schedule = '135')
         items = Nokogiri::XML(r.to_xml).xpath('//item')
         assert_equal 5, items.length
@@ -54,12 +43,20 @@ class RerunUnitTests < Test::Unit::TestCase
     end
 
     def test_no_pubdate
-        #remove the pubDates
-        for item in @doc.xpath('//item')
-            item.at('pubDate').remove
+        # use a local timemap instead of hitting the archive.org servers
+        def Archive.fromUrl(url)
+            cb = lambda do |url|
+                return File.open(url[7..-1])
+            end
+            Fetch.instance.set_callback(&cb)
+            return Archive.fromResource(File.open('test/data/simple-nopub.timemap'))
+            Fetch.instance.nil_callback
         end
+        Fetch.instance.global_canonicalize = false
+        url = 'test/data/simple-nopub.rss'
+        @arc.create(url)
 
-        feed = Feed.fromResource(@doc.to_xml)
+        feed = Feed.new(url, @arc)
         r = Rerun.new(feed, startTime = Chrono.now - 12, schedule = '135')
         items = Nokogiri::XML(r.to_xml).xpath('//item')
         assert_equal 5, items.length

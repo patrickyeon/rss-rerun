@@ -15,7 +15,7 @@ class Feed
     def initialize(url, arc)
         # arc is the Archive that stores the history for the url
         if not arc.cached? url
-            raise StandardError 'Feed not archived'
+            raise StandardError.new('Feed not archived')
         end
 
         @url = url
