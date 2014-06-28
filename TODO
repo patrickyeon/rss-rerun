@@ -5,20 +5,18 @@
 |- CI through travisCI
 |- my own CI bot
 - track failures, execution time
-- less handing off huge amounts of data
-|- splitting up archives into chunks
-|- only returning most recent N items for app
-|- calculating what items we need before building the feed in rerun.rb
+|- dashboard
 - check various formats (RSS 0.9, 2.0, atom, itunes)
 |- mal-formed feeds
 - proper handle on caught-up feeds
 - proper security look-through
 - "twelve factor app"
 - less of hash-of-arrays-of-hashes...
+- local disk layer for testing
 
 0.3
 ===
-- archiving
+- auto-archiving
 - style check
 - user-selected update time
 |- optionally, let user bump in and ask for an item right now
