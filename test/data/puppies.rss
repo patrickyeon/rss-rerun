@@ -1,0 +1,715 @@
+<?xml version="1.0"?>
+<rss>
+  <channel>
+    <title>101 dalmations</title>
+    <url>http://www.example.com/101.rss</url>
+    <description>A well-behaved feed with 101 items in it</description>
+    <item>
+      <title>Puppy #101</title>
+      <link>http://example.com/puppy101</link>
+      <pubDate>Tue, 30 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog101</guid>
+    </item>
+    <item>
+      <title>Puppy #100</title>
+      <link>http://example.com/puppy100</link>
+      <pubDate>Mon, 29 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog100</guid>
+    </item>
+    <item>
+      <title>Puppy #99</title>
+      <link>http://example.com/puppy99</link>
+      <pubDate>Sun, 28 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog99</guid>
+    </item>
+    <item>
+      <title>Puppy #98</title>
+      <link>http://example.com/puppy98</link>
+      <pubDate>Sat, 27 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog98</guid>
+    </item>
+    <item>
+      <title>Puppy #97</title>
+      <link>http://example.com/puppy97</link>
+      <pubDate>Fri, 26 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog97</guid>
+    </item>
+    <item>
+      <title>Puppy #96</title>
+      <link>http://example.com/puppy96</link>
+      <pubDate>Thu, 25 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog96</guid>
+    </item>
+    <item>
+      <title>Puppy #95</title>
+      <link>http://example.com/puppy95</link>
+      <pubDate>Wed, 24 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog95</guid>
+    </item>
+    <item>
+      <title>Puppy #94</title>
+      <link>http://example.com/puppy94</link>
+      <pubDate>Tue, 23 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog94</guid>
+    </item>
+    <item>
+      <title>Puppy #93</title>
+      <link>http://example.com/puppy93</link>
+      <pubDate>Mon, 22 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog93</guid>
+    </item>
+    <item>
+      <title>Puppy #92</title>
+      <link>http://example.com/puppy92</link>
+      <pubDate>Sun, 21 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog92</guid>
+    </item>
+    <item>
+      <title>Puppy #91</title>
+      <link>http://example.com/puppy91</link>
+      <pubDate>Sat, 20 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog91</guid>
+    </item>
+    <item>
+      <title>Puppy #90</title>
+      <link>http://example.com/puppy90</link>
+      <pubDate>Fri, 19 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog90</guid>
+    </item>
+    <item>
+      <title>Puppy #89</title>
+      <link>http://example.com/puppy89</link>
+      <pubDate>Thu, 18 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog89</guid>
+    </item>
+    <item>
+      <title>Puppy #88</title>
+      <link>http://example.com/puppy88</link>
+      <pubDate>Wed, 17 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog88</guid>
+    </item>
+    <item>
+      <title>Puppy #87</title>
+      <link>http://example.com/puppy87</link>
+      <pubDate>Tue, 16 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog87</guid>
+    </item>
+    <item>
+      <title>Puppy #86</title>
+      <link>http://example.com/puppy86</link>
+      <pubDate>Mon, 15 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog86</guid>
+    </item>
+    <item>
+      <title>Puppy #85</title>
+      <link>http://example.com/puppy85</link>
+      <pubDate>Sun, 14 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog85</guid>
+    </item>
+    <item>
+      <title>Puppy #84</title>
+      <link>http://example.com/puppy84</link>
+      <pubDate>Sat, 13 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog84</guid>
+    </item>
+    <item>
+      <title>Puppy #83</title>
+      <link>http://example.com/puppy83</link>
+      <pubDate>Fri, 12 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog83</guid>
+    </item>
+    <item>
+      <title>Puppy #82</title>
+      <link>http://example.com/puppy82</link>
+      <pubDate>Thu, 11 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog82</guid>
+    </item>
+    <item>
+      <title>Puppy #81</title>
+      <link>http://example.com/puppy81</link>
+      <pubDate>Wed, 10 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog81</guid>
+    </item>
+    <item>
+      <title>Puppy #80</title>
+      <link>http://example.com/puppy80</link>
+      <pubDate>Tue, 9 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog80</guid>
+    </item>
+    <item>
+      <title>Puppy #79</title>
+      <link>http://example.com/puppy79</link>
+      <pubDate>Mon, 8 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog79</guid>
+    </item>
+    <item>
+      <title>Puppy #78</title>
+      <link>http://example.com/puppy78</link>
+      <pubDate>Sun, 7 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog78</guid>
+    </item>
+    <item>
+      <title>Puppy #77</title>
+      <link>http://example.com/puppy77</link>
+      <pubDate>Sat, 6 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog77</guid>
+    </item>
+    <item>
+      <title>Puppy #76</title>
+      <link>http://example.com/puppy76</link>
+      <pubDate>Fri, 5 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog76</guid>
+    </item>
+    <item>
+      <title>Puppy #75</title>
+      <link>http://example.com/puppy75</link>
+      <pubDate>Thu, 4 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog75</guid>
+    </item>
+    <item>
+      <title>Puppy #74</title>
+      <link>http://example.com/puppy74</link>
+      <pubDate>Wed, 3 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog74</guid>
+    </item>
+    <item>
+      <title>Puppy #73</title>
+      <link>http://example.com/puppy73</link>
+      <pubDate>Tue, 2 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog73</guid>
+    </item>
+    <item>
+      <title>Puppy #72</title>
+      <link>http://example.com/puppy72</link>
+      <pubDate>Mon, 1 Jul 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog72</guid>
+    </item>
+    <item>
+      <title>Puppy #71</title>
+      <link>http://example.com/puppy71</link>
+      <pubDate>Sun, 30 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog71</guid>
+    </item>
+    <item>
+      <title>Puppy #70</title>
+      <link>http://example.com/puppy70</link>
+      <pubDate>Sat, 29 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog70</guid>
+    </item>
+    <item>
+      <title>Puppy #69</title>
+      <link>http://example.com/puppy69</link>
+      <pubDate>Fri, 28 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog69</guid>
+    </item>
+    <item>
+      <title>Puppy #68</title>
+      <link>http://example.com/puppy68</link>
+      <pubDate>Thu, 27 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog68</guid>
+    </item>
+    <item>
+      <title>Puppy #67</title>
+      <link>http://example.com/puppy67</link>
+      <pubDate>Wed, 26 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog67</guid>
+    </item>
+    <item>
+      <title>Puppy #66</title>
+      <link>http://example.com/puppy66</link>
+      <pubDate>Tue, 25 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog66</guid>
+    </item>
+    <item>
+      <title>Puppy #65</title>
+      <link>http://example.com/puppy65</link>
+      <pubDate>Mon, 24 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog65</guid>
+    </item>
+    <item>
+      <title>Puppy #64</title>
+      <link>http://example.com/puppy64</link>
+      <pubDate>Sun, 23 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog64</guid>
+    </item>
+    <item>
+      <title>Puppy #63</title>
+      <link>http://example.com/puppy63</link>
+      <pubDate>Sat, 22 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog63</guid>
+    </item>
+    <item>
+      <title>Puppy #62</title>
+      <link>http://example.com/puppy62</link>
+      <pubDate>Fri, 21 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog62</guid>
+    </item>
+    <item>
+      <title>Puppy #61</title>
+      <link>http://example.com/puppy61</link>
+      <pubDate>Thu, 20 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog61</guid>
+    </item>
+    <item>
+      <title>Puppy #60</title>
+      <link>http://example.com/puppy60</link>
+      <pubDate>Wed, 19 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog60</guid>
+    </item>
+    <item>
+      <title>Puppy #59</title>
+      <link>http://example.com/puppy59</link>
+      <pubDate>Tue, 18 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog59</guid>
+    </item>
+    <item>
+      <title>Puppy #58</title>
+      <link>http://example.com/puppy58</link>
+      <pubDate>Mon, 17 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog58</guid>
+    </item>
+    <item>
+      <title>Puppy #57</title>
+      <link>http://example.com/puppy57</link>
+      <pubDate>Sun, 16 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog57</guid>
+    </item>
+    <item>
+      <title>Puppy #56</title>
+      <link>http://example.com/puppy56</link>
+      <pubDate>Sat, 15 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog56</guid>
+    </item>
+    <item>
+      <title>Puppy #55</title>
+      <link>http://example.com/puppy55</link>
+      <pubDate>Fri, 14 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog55</guid>
+    </item>
+    <item>
+      <title>Puppy #54</title>
+      <link>http://example.com/puppy54</link>
+      <pubDate>Thu, 13 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog54</guid>
+    </item>
+    <item>
+      <title>Puppy #53</title>
+      <link>http://example.com/puppy53</link>
+      <pubDate>Wed, 12 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog53</guid>
+    </item>
+    <item>
+      <title>Puppy #52</title>
+      <link>http://example.com/puppy52</link>
+      <pubDate>Tue, 11 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog52</guid>
+    </item>
+    <item>
+      <title>Puppy #51</title>
+      <link>http://example.com/puppy51</link>
+      <pubDate>Mon, 10 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog51</guid>
+    </item>
+    <item>
+      <title>Puppy #50</title>
+      <link>http://example.com/puppy50</link>
+      <pubDate>Sun, 9 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog50</guid>
+    </item>
+    <item>
+      <title>Puppy #49</title>
+      <link>http://example.com/puppy49</link>
+      <pubDate>Sat, 8 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog49</guid>
+    </item>
+    <item>
+      <title>Puppy #48</title>
+      <link>http://example.com/puppy48</link>
+      <pubDate>Fri, 7 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog48</guid>
+    </item>
+    <item>
+      <title>Puppy #47</title>
+      <link>http://example.com/puppy47</link>
+      <pubDate>Thu, 6 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog47</guid>
+    </item>
+    <item>
+      <title>Puppy #46</title>
+      <link>http://example.com/puppy46</link>
+      <pubDate>Wed, 5 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog46</guid>
+    </item>
+    <item>
+      <title>Puppy #45</title>
+      <link>http://example.com/puppy45</link>
+      <pubDate>Tue, 4 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog45</guid>
+    </item>
+    <item>
+      <title>Puppy #44</title>
+      <link>http://example.com/puppy44</link>
+      <pubDate>Mon, 3 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog44</guid>
+    </item>
+    <item>
+      <title>Puppy #43</title>
+      <link>http://example.com/puppy43</link>
+      <pubDate>Sun, 2 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog43</guid>
+    </item>
+    <item>
+      <title>Puppy #42</title>
+      <link>http://example.com/puppy42</link>
+      <pubDate>Sat, 1 Jun 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog42</guid>
+    </item>
+    <item>
+      <title>Puppy #41</title>
+      <link>http://example.com/puppy41</link>
+      <pubDate>Fri, 31 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog41</guid>
+    </item>
+    <item>
+      <title>Puppy #40</title>
+      <link>http://example.com/puppy40</link>
+      <pubDate>Thu, 30 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog40</guid>
+    </item>
+    <item>
+      <title>Puppy #39</title>
+      <link>http://example.com/puppy39</link>
+      <pubDate>Wed, 29 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog39</guid>
+    </item>
+    <item>
+      <title>Puppy #38</title>
+      <link>http://example.com/puppy38</link>
+      <pubDate>Tue, 28 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog38</guid>
+    </item>
+    <item>
+      <title>Puppy #37</title>
+      <link>http://example.com/puppy37</link>
+      <pubDate>Mon, 27 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog37</guid>
+    </item>
+    <item>
+      <title>Puppy #36</title>
+      <link>http://example.com/puppy36</link>
+      <pubDate>Sun, 26 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog36</guid>
+    </item>
+    <item>
+      <title>Puppy #35</title>
+      <link>http://example.com/puppy35</link>
+      <pubDate>Sat, 25 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog35</guid>
+    </item>
+    <item>
+      <title>Puppy #34</title>
+      <link>http://example.com/puppy34</link>
+      <pubDate>Fri, 24 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog34</guid>
+    </item>
+    <item>
+      <title>Puppy #33</title>
+      <link>http://example.com/puppy33</link>
+      <pubDate>Thu, 23 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog33</guid>
+    </item>
+    <item>
+      <title>Puppy #32</title>
+      <link>http://example.com/puppy32</link>
+      <pubDate>Wed, 22 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog32</guid>
+    </item>
+    <item>
+      <title>Puppy #31</title>
+      <link>http://example.com/puppy31</link>
+      <pubDate>Tue, 21 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog31</guid>
+    </item>
+    <item>
+      <title>Puppy #30</title>
+      <link>http://example.com/puppy30</link>
+      <pubDate>Mon, 20 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog30</guid>
+    </item>
+    <item>
+      <title>Puppy #29</title>
+      <link>http://example.com/puppy29</link>
+      <pubDate>Sun, 19 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog29</guid>
+    </item>
+    <item>
+      <title>Puppy #28</title>
+      <link>http://example.com/puppy28</link>
+      <pubDate>Sat, 18 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog28</guid>
+    </item>
+    <item>
+      <title>Puppy #27</title>
+      <link>http://example.com/puppy27</link>
+      <pubDate>Fri, 17 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog27</guid>
+    </item>
+    <item>
+      <title>Puppy #26</title>
+      <link>http://example.com/puppy26</link>
+      <pubDate>Thu, 16 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog26</guid>
+    </item>
+    <item>
+      <title>Puppy #25</title>
+      <link>http://example.com/puppy25</link>
+      <pubDate>Wed, 15 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog25</guid>
+    </item>
+    <item>
+      <title>Puppy #24</title>
+      <link>http://example.com/puppy24</link>
+      <pubDate>Tue, 14 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog24</guid>
+    </item>
+    <item>
+      <title>Puppy #23</title>
+      <link>http://example.com/puppy23</link>
+      <pubDate>Mon, 13 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog23</guid>
+    </item>
+    <item>
+      <title>Puppy #22</title>
+      <link>http://example.com/puppy22</link>
+      <pubDate>Sun, 12 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog22</guid>
+    </item>
+    <item>
+      <title>Puppy #21</title>
+      <link>http://example.com/puppy21</link>
+      <pubDate>Sat, 11 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog21</guid>
+    </item>
+    <item>
+      <title>Puppy #20</title>
+      <link>http://example.com/puppy20</link>
+      <pubDate>Fri, 10 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog20</guid>
+    </item>
+    <item>
+      <title>Puppy #19</title>
+      <link>http://example.com/puppy19</link>
+      <pubDate>Thu, 9 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog19</guid>
+    </item>
+    <item>
+      <title>Puppy #18</title>
+      <link>http://example.com/puppy18</link>
+      <pubDate>Wed, 8 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog18</guid>
+    </item>
+    <item>
+      <title>Puppy #17</title>
+      <link>http://example.com/puppy17</link>
+      <pubDate>Tue, 7 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog17</guid>
+    </item>
+    <item>
+      <title>Puppy #16</title>
+      <link>http://example.com/puppy16</link>
+      <pubDate>Mon, 6 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog16</guid>
+    </item>
+    <item>
+      <title>Puppy #15</title>
+      <link>http://example.com/puppy15</link>
+      <pubDate>Sun, 5 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog15</guid>
+    </item>
+    <item>
+      <title>Puppy #14</title>
+      <link>http://example.com/puppy14</link>
+      <pubDate>Sat, 4 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog14</guid>
+    </item>
+    <item>
+      <title>Puppy #13</title>
+      <link>http://example.com/puppy13</link>
+      <pubDate>Fri, 3 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog13</guid>
+    </item>
+    <item>
+      <title>Puppy #12</title>
+      <link>http://example.com/puppy12</link>
+      <pubDate>Thu, 2 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog12</guid>
+    </item>
+    <item>
+      <title>Puppy #11</title>
+      <link>http://example.com/puppy11</link>
+      <pubDate>Wed, 1 May 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog11</guid>
+    </item>
+    <item>
+      <title>Puppy #10</title>
+      <link>http://example.com/puppy10</link>
+      <pubDate>Tue, 30 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog10</guid>
+    </item>
+    <item>
+      <title>Puppy #9</title>
+      <link>http://example.com/puppy9</link>
+      <pubDate>Mon, 29 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog9</guid>
+    </item>
+    <item>
+      <title>Puppy #8</title>
+      <link>http://example.com/puppy8</link>
+      <pubDate>Sun, 28 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog8</guid>
+    </item>
+    <item>
+      <title>Puppy #7</title>
+      <link>http://example.com/puppy7</link>
+      <pubDate>Sat, 27 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog7</guid>
+    </item>
+    <item>
+      <title>Puppy #6</title>
+      <link>http://example.com/puppy6</link>
+      <pubDate>Fri, 26 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog6</guid>
+    </item>
+    <item>
+      <title>Puppy #5</title>
+      <link>http://example.com/puppy5</link>
+      <pubDate>Thu, 25 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog5</guid>
+    </item>
+    <item>
+      <title>Puppy #4</title>
+      <link>http://example.com/puppy4</link>
+      <pubDate>Wed, 24 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog4</guid>
+    </item>
+    <item>
+      <title>Puppy #3</title>
+      <link>http://example.com/puppy3</link>
+      <pubDate>Tue, 23 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog3</guid>
+    </item>
+    <item>
+      <title>Puppy #2</title>
+      <link>http://example.com/puppy2</link>
+      <pubDate>Mon, 22 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog2</guid>
+    </item>
+    <item>
+      <title>Puppy #1</title>
+      <link>http://example.com/puppy1</link>
+      <pubDate>Sun, 21 Apr 2013 00:00:00 +0000</pubDate>
+      <description>woof</description>
+      <guid>dog1</guid>
+    </item>
+  </channel>
+</rss>

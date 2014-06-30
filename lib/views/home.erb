@@ -7,19 +7,7 @@
 				form.elements[i].checked = check;
 			}
 	}
-    function showMagic(check) {
-        var text = document.getElementById("magic-warn");
-        if (check) {
-            text.style.display = 'block';
-        } else {
-            text.style.display = 'none';
-        }
-    }
 </script>
-<style>
-    #magic-warn {display:none;
-                 background: #eee8d5;}
-</style>
 
 <h2>RSS Reruns</h2>
 
@@ -45,7 +33,7 @@ a week ago!
 <br/>
 
 <li>
-<a href="rerun?url=http%3A%2F%2Ffeeds.wnyc.org%2Fradiolab&startDate=<%= DateTime.now.strftime('%F') %>&sun&mon&tue&wed&thu&fri&sat">Radiolab</a>, broadcast from WNYC, is a great offering from NPR that does a great job of skimming over some science at just the right level to spur some interest. The re-broadcast starts today (!) and delivers one new show from the archives daily, doesn't even rest for weekends. Unfortunately, the RSS feed doesn't go all the way back to the beginning, so rss-rerun doesn't start from the first episode. This will be fixed soon enough using a feature that is currently under development.
+<a href="rerun?url=http%3A%2F%2Ffeeds.wnyc.org%2Fradiolab&startDate=<%= DateTime.now.strftime('%F') %>&sun&mon&tue&wed&thu&fri&sat">Radiolab</a>, broadcast from WNYC, is a great offering from NPR that does a great job of skimming over some science at just the right level to spur some interest. The re-broadcast starts today (!) and delivers one new show from the archives daily, doesn't even rest for weekends.
 </li>
 </ul>
 
@@ -75,29 +63,6 @@ a week ago!
 	<br/>
 
 	<input type="submit" value="Create Reruns"/><br/>
-    <input type="checkbox" name="archive" value="" onclick="showMagic(this.checked)"/>
-    Enable magic.
-</form>
-<span id="magic-warn"><i>Magic</i> is a set of beta features only
-enabled for a small number of feeds that are known not to break them. If it
-breaks or refuses to run on your feed of choice, too bad!<br/>
-Currently the only magic feed is <a href=#fillURL
-    onclick="document.getElementById('feedurl').value='http://theamphour.com/feed';">
-    http://theamphour.com/feed</a>.<br/>
-<br/>
-If you'd like to nominate another feed for some beta features, please enter
-it here, along with an email address to notify you when it's done.<br/>
-<form action="/magic_req" method="GET">
-    Feed: <input type="url" name="request_url">
-    Email: <input type="email" name="contact">
-    <br/>
-    <input type="checkbox" name="more_info"> Keep me up to date about rss-reruns.
-    <br/>
-    We like peaceful inboxes and respect yours too! 
-    Unless you click that checkbox, your email address will not be used for
-    <strong>anything</strong> except notifying you about this specific link.
-    <br/>
-    <input type="submit" value="Request magic">
 </form>
 </span>
 <%= erb :footer %>

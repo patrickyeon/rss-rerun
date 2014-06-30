@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+	<channel>
+		<title>Test RSS feed with ten items</title>
+		<link>http://example.com/ten-items</link>
+		<description>A well-behaved feed with ten items.</description>
+		<item>
+			<title>Item 10</title>
+			<link>http://example.com/feed/10</link>
+			<guid>10</guid>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 9</title>
+			<guid>9</guid>
+			<link>http://example.com/feed/9</link>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 8</title>
+			<guid>8</guid>
+			<link>http://example.com/feed/8</link>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 7</title>
+			<guid>7</guid>
+			<link>http://example.com/feed/7</link>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 6</title>
+			<guid>6</guid>
+			<link>http://example.com/feed/6</link>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 5</title>
+			<guid>5</guid>
+			<link>http://example.com/feed/5</link>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 4</title>
+			<guid>4</guid>
+			<link>http://example.com/feed/4</link>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 3</title>
+			<guid>3</guid>
+			<link>http://example.com/feed/3</link>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 2</title>
+			<guid>2</guid>
+			<link>http://example.com/feed/2</link>
+			<description>foo</description>
+		</item>
+		<item>
+			<title>Item 1</title>
+			<guid>1</guid>
+			<link>http://example.com/feed/1</link>
+			<description>foo</description>
+		</item>
+	</channel>
+</rss>

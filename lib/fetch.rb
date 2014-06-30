@@ -7,6 +7,7 @@ class Fetch
     @@g_sanitize = true
     @@g_canonicalize = true
     @@callback = nil
+    @@url_cache = {}
 
     def initialize
         @@g_sanitize = true
@@ -64,6 +65,10 @@ class Fetch
         unless @@g_canonicalize
             return url
         end
+        if @@url_cache.include? url
+            return @@url_cache[url]
+        end
+        orig_url = url
         visitedurls, redircount = [], 0
         while redircount < 10 do
             if @@g_sanitize
@@ -72,6 +77,7 @@ class Fetch
             r = Net::HTTP.get_response(URI.parse(url))
             case r
             when Net::HTTPSuccess then
+                @@url_cache[orig_url] = url
                 return url
             when Net::HTTPRedirection then
                 redircount += 1

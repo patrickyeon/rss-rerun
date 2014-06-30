@@ -1,0 +1,25 @@
+<%= erb :header, :locals => {'title' => 'Feed Request'} %>
+
+<h2>Request a new feed</h2>
+
+Seeing as this is all pretty early stage right now, we don't quite have enough
+faith in the auto-generated historical feeds to just let our code run amok. If
+you'd like to point us at a specific feed you'd like to have re-runs of, let us
+know here and we'll tell you when it's happened and been approved by one of our
+people.
+<br />
+<form action="/magic_req" method="GET">
+    Feed: <input type="text" name="request_url" value="<%= feed_url %>">
+    <br />
+    Email: <input type="text" name="contact">
+    <br/>
+    <input type="checkbox" name="more_info"> Keep me up to date about rss-reruns.
+    <br/>
+    We like peaceful inboxes and respect yours too! 
+    Unless you click that checkbox, your email address will not be used for
+    <strong>anything</strong> except notifying you about this specific link.
+    <br/>
+    <input type="submit" value="Request feed">
+</form>
+
+<%= erb :footer %>
