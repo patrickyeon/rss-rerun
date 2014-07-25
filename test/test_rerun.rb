@@ -2,6 +2,7 @@ require_relative '../lib/rerun.rb'
 require_relative '../lib/feed.rb'
 require_relative '../lib/chrono.rb'
 require_relative '../lib/fetch.rb'
+require_relative '../lib/store.rb'
 require 'test/unit'
 require 'nokogiri'
 
@@ -10,9 +11,10 @@ class RerunUnitTests < Test::Unit::TestCase
     def setup
         # arbitrarily, pretend it's Apr 20, 2014 (a Sunday)
         Chrono.instance.set_now DateTime.parse('Sun, Apr 20 2014')
-        @arc = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                           ENV['AMAZON_SECRET_ACCESS_KEY'],
-                           ENV['AMAZON_S3_TEST_BUCKET'])
+
+        @arc = Archive.new(S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                       ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                       ENV['AMAZON_S3_TEST_BUCKET']))
     end
 
     def test_mwf

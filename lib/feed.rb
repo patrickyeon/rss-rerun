@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 require 'nokogiri'
-require 'aws-sdk'
 require 'json'
 require_relative 'fetch.rb'
+require_relative 'store.rb'
 
 # Assumptions for this file:
 #  o Unless otherwise stated, urls passed to any methods here are safe
@@ -50,10 +50,12 @@ end
 
 class Archive
     # TODO all the error conditions
-    def initialize(id, secret, bucket)
-        @sess = AWS::S3.new(:access_key_id => id,
-                            :secret_access_key => secret)
-        @bucket = @sess.buckets[bucket]
+    def initialize(store)
+        @store = store
+        # TODO see if I want to move caching out to the store. Probably.
+        #       There is an argument to keep it here though, as it's much less
+        #       likely for there to be an error due to the cache from one short
+        #       run here.
         @recently_cached = []
         @info = {}
     end
@@ -64,11 +66,11 @@ class Archive
         if @recently_cached.include? key
             return true
         end
-        if @bucket.objects.with_prefix(key).count == 0
+        unless @store.contains?(key + '/info.txt')
             return false
         end
         # as a matter of fact, no, collisions aren't handled well
-        info = JSON.parse(@bucket.objects[key + '/info.txt'].read)
+        info = JSON.parse(@store.read(key + '/info.txt'))
         if info['url'] == url
             @recently_cached.push key
             return true
@@ -82,10 +84,11 @@ class Archive
             return nil
         end
 
-        if @info[keyfor(url)] == nil
-            @info[keyfor(url)] = JSON.parse(@bucket.objects[keyfor(url) + '/info.txt'].read)
+        key = keyfor(url)
+        if @info[key] == nil
+            @info[key] = JSON.parse(@store.read(key + '/info.txt'))
         end
-        return @info[keyfor(url)]
+        return @info[key]
 
     end
 
@@ -108,21 +111,20 @@ class Archive
             return recall url, info['item_count']
         end
 
-        bins = []
-        @bucket.objects.with_prefix(keyfor(url)).each {|o| bins.push o}
-        bins.keep_if {|o| o.key.end_with?('.items')}
-        bins.sort_by! {|o| Integer(/\/0*([0-9]+)/.match(o.key)[1])}
+        bins = @store.list(keyfor(url))
+        bins.keep_if {|o| o.end_with?('.items')}
+        bins.sort_by! {|o| Integer(/\/0*([0-9]+)/.match(o)[1])}
         contained = loc / 25
         if contained == 0
             # special case, we would return up to 25 items, but the requester
             #  is asking for something so early that there aren't 24 previous
             #  items to give them.
-            items = bins[0].read
+            items = @store.read(bins[0])
             items = Nokogiri::XML('<x>%s</x>' % items).xpath('//item')
             items = items[0, loc]
         else
-            items = bins[contained-1].read
-            items << bins[contained].read
+            items = @store.read(bins[contained-1])
+            items << @store.read(bins[contained])
             items = Nokogiri::XML('<x>%s</x>' % items).xpath('//item')
             items = items[loc % 25, 25]
         end
@@ -135,16 +137,16 @@ class Archive
         items = Nokogiri::XML(feed).xpath('//item').reverse
 
         # for now, just totally clobber anything that was already there
-        @bucket.objects.with_prefix(keyfor(url)).each do |o|
-            o.delete
+        if @store.contains?(keyfor(url))
+            @store.list(keyfor(url)).each {|name| @store.delete(name)}
         end
 
         info = {'url' => url, 'item_count' => items.length}
         @info[keyfor(url)] = nil
-        @bucket.objects[keyfor(url) + '/info.txt'].write(info.to_json)
+        @store.write(keyfor(url) + '/info.txt', info.to_json)
         (0..(items.length / 25)).each do |i|
-            bin = @bucket.objects[keyfor(url) + ('/%d.items' % i)]
-            bin.write(items[25 * i, 25].to_xml.force_encoding('UTF-8'))
+            name = keyfor(url) + ('/%d.items' % i)
+            @store.write(name, items[25 * i, 25].to_xml.force_encoding('UTF-8'))
         end
     end
 
@@ -160,21 +162,21 @@ class Archive
         fill = 25 - (info['item_count'] % 25)
         info['item_count'] = info['item_count'] + items.length
         if fill != 25
-            bin = @bucket.objects[binkey % last_bin].read.force_encoding('UTF-8')
+            bin = @store.read(binkey % last_bin).force_encoding('UTF-8')
             bin << items[0, fill].to_xml.force_encoding('UTF-8')
-            @bucket.objects[binkey % last_bin].write(bin)
+            @store.write(binkey % last_bin, bin)
             items = items[fill..-1]
         end
 
         while items != nil && items.length > 0 do
             last_bin += 1
-            bin = @bucket.objects[binkey % last_bin]
-            bin.write(items[0, 25].to_xml.force_encoding('UTF-8'))
+            @store.write(binkey % last_bin,
+                         items[0, 25].to_xml.force_encoding('UTF-8'))
             items = items[25..-1]
         end
 
         @info[keyfor(url)] = nil
-        @bucket.objects[keyfor(url) + '/info.txt'].write(info.to_json)
+        @store.write(keyfor(url) + '/info.txt', info.to_json)
     end
 
 

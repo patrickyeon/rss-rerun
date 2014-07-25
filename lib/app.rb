@@ -1,6 +1,7 @@
 require_relative 'rerun.rb'
 require_relative 'feed.rb'
 require_relative 'chrono.rb'
+require_relative 'store.rb'
 require 'sinatra'
 require 'erb'
 require 'cgi'
@@ -44,9 +45,9 @@ get '/preview' do
     begin
         feed = Timeout::timeout(35) {
             # timeout arbitrarily chosen
-            archive = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                  ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                  ENV['AMAZON_S3_BUCKET'])
+            archive = Archive.new(S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                              ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                              ENV['AMAZON_S3_BUCKET']))
             origfeed = Feed.new(feedurl, archive)
             Rerun.new(origfeed, Chrono.now - backdate, schedule)
         }
@@ -85,9 +86,9 @@ get '/rerun' do
 
     begin
         feed = Timeout::timeout(35) {
-            archive = Archive.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                  ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                  ENV['AMAZON_S3_BUCKET'])
+            archive = Archive.new(S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                              ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                              ENV['AMAZON_S3_BUCKET']))
             origfeed = Feed.new(feedurl, archive)
             Rerun.new(origfeed, startDate, sched_from(params))
         }
