@@ -14,9 +14,13 @@ class FeedUnitTests < Test::Unit::TestCase
             return Archive.fromResource(File.open('test/data/timemap'))
             Fetch.instance.nil_callback
         end
-        @s3_store = S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                ENV['AMAZON_S3_TEST_BUCKET'])
+        if ENV['RSS_RERUN_STORE'] == 'S3'
+            @store = S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                 ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                 ENV['AMAZON_S3_TEST_BUCKET'])
+        else
+            @store = DiskStore.new('tmp/store')
+        end
     end
 
     def teardown
@@ -42,7 +46,7 @@ class FeedUnitTests < Test::Unit::TestCase
 
     def test_total_archive
         Fetch.instance.global_canonicalize = false
-        a = Archive.new(@s3_store)
+        a = Archive.new(@store)
         
         url = 'test/data/original'
         a.create(url)
@@ -54,7 +58,7 @@ class FeedUnitTests < Test::Unit::TestCase
 
     def test_s3_archive
         Fetch.instance.global_canonicalize = false
-        a = Archive.new(@s3_store)
+        a = Archive.new(@store)
         url = 'test/data/original'
         a.create url
         assert a.cached?(url)
@@ -64,7 +68,7 @@ class FeedUnitTests < Test::Unit::TestCase
 
     def test_s3_archive_collide
         Fetch.instance.global_canonicalize = false
-        a = Archive.new(@s3_store)
+        a = Archive.new(@store)
         def a.keyfor(url)
             return 'collide'
         end
@@ -89,9 +93,14 @@ class LargeFeedUnitTests < Test::Unit::TestCase
         end
 
         Fetch.instance.global_canonicalize = false
-        @arc = Archive.new(S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                       ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                       ENV['AMAZON_S3_TEST_BUCKET']))
+        if ENV['RSS_RERUN_STORE'] == 'S3'
+            store = S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                ENV['AMAZON_S3_TEST_BUCKET'])
+        else
+            store = DiskStore.new('tmp/store')
+        end
+        @arc = Archive.new(store)
         @url = 'test/data/puppies.rss'
         @arc.create @url
     end
@@ -119,5 +128,4 @@ class LargeFeedUnitTests < Test::Unit::TestCase
             assert_equal 101, Integer(stored[-1].at('guid').content[3..-1])
         end
     end
-
 end
