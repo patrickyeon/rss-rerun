@@ -65,15 +65,20 @@ class DiskStore < Store
     end
 
     def write(name, text)
-        f = File.open(File.join(@root, name), 'w')
+        fname = File.join(@root, name)
+        unless File.exists?(File.dirname(fname))
+            Dir.mkdir(File.dirname(fname))
+        end
+        f = File.open(fname, 'w')
         f.write(text)
         f.close
     end
 
     def list(stub)
-        return Dir.entries(File.join(@root, stub)).select { |f|
+        files = Dir.entries(File.join(@root, stub)).select { |f|
             File.file?(File.join(@root, stub, f))
         }
+        return files.collect {|f| File.join(stub, f)}
     end
 
     def delete(name)
