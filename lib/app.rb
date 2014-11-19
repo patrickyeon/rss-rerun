@@ -1,5 +1,6 @@
 require_relative 'rerun.rb'
 require_relative 'feed.rb'
+require_relative 'fetch.rb'
 require_relative 'chrono.rb'
 require_relative 'store.rb'
 require 'sinatra'
@@ -25,7 +26,10 @@ get '/preview' do
     end
 
     feedurl = safe_url(params[:url])
-    unless whitelisted?(feedurl)
+    archive = Archive.new(S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                      ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                      ENV['AMAZON_S3_BUCKET']))
+    unless archive.cached?(feedurl)
         return erb :request, :locals => {:feed_url => feedurl}
     end
 
@@ -45,9 +49,6 @@ get '/preview' do
     begin
         feed = Timeout::timeout(35) {
             # timeout arbitrarily chosen
-            archive = Archive.new(S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                              ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                              ENV['AMAZON_S3_BUCKET']))
             origfeed = Feed.new(feedurl, archive)
             Rerun.new(origfeed, Chrono.now - backdate, schedule)
         }
@@ -73,7 +74,10 @@ end
 
 get '/rerun' do
     feedurl = safe_url(params[:url])
-    unless whitelisted?(feedurl)
+    archive = Archive.new(S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
+                                      ENV['AMAZON_SECRET_ACCESS_KEY'],
+                                      ENV['AMAZON_S3_BUCKET']))
+    unless archive.cached?(feedurl)
         return erb :request, :locals => {:feed_url => feedurl}
     end
 
@@ -86,9 +90,6 @@ get '/rerun' do
 
     begin
         feed = Timeout::timeout(35) {
-            archive = Archive.new(S3Store.new(ENV['AMAZON_ACCESS_KEY_ID'],
-                                              ENV['AMAZON_SECRET_ACCESS_KEY'],
-                                              ENV['AMAZON_S3_BUCKET']))
             origfeed = Feed.new(feedurl, archive)
             Rerun.new(origfeed, startDate, sched_from(params))
         }
@@ -155,9 +156,4 @@ def safe_url(url)
     end
 
     return returl
-end
-
-def whitelisted?(url)
-    # for now it's just the amp hour
-    return /^http:\/\/(www.)?theamphour.com\/feed\/?$/.match(url) != nil
 end
