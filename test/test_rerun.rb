@@ -69,4 +69,38 @@ class RerunUnitTests < Test::Unit::TestCase
             assert_equal day, date.day
         end
     end
+
+    def test_passthrough
+        # use a local timemap instead of hitting the archive.org servers
+        def Archive.fromUrl(url)
+            cb = lambda do |url|
+                return File.open(url[7..-1])
+            end
+            Fetch.instance.set_callback(&cb)
+            return Archive.fromResource(File.open('test/data/simple-weekly.timemap'))
+            Fetch.instance.nil_callback
+        end
+        Fetch.instance.global_canonicalize = false
+        url = 'test/data/simple-weekly.rss'
+        @arc.create(url)
+
+        feed = Feed.new(url, @arc)
+        r = Rerun.new(feed, startTime = Date.parse('2014-03-02',
+                                                   schedule = '1234567'))
+        # so it should re-broadcast items 1-5, and then pass-through the rest
+        items = Nokogiri::XML(r.to_xml).xpath('//item')
+        assert_equal 10, items.length
+        cases = [5, 29, 22, 15, 8, 7, 6, 5, 4, 3].zip(items)
+        # special-case the first one, as month is different
+        date = DateTime.parse(cases[0][1].at('pubDate').to_str)
+        assert_equal 2014, date.year
+        assert_equal 4, date.month
+        assert_equal 5, date.day
+        for day, it in cases[1..-1]
+            date = DateTime.parse(it.at('pubDate').to_str)
+            assert_equal 2014, date.year
+            assert_equal 3, date.month
+            assert_equal day, date.day
+        end
+    end
 end

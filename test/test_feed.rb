@@ -50,7 +50,9 @@ class FeedUnitTests < Test::Unit::TestCase
         
         url = 'test/data/original'
         a.create(url)
-        items = Nokogiri::XML(Feed.new(url, a).recall(-1)).xpath('//item')
+        recalled = Feed.new(url, a).recall(-1)
+        items = Nokogiri::XML(recalled[:items]).xpath('//item')
+        assert_equal 10, recalled[:idx]
         assert_equal 10, items.length
         guids = items.collect {|item| Integer(item.at('guid').content)}
         assert_equal Array(1..10), guids
@@ -62,7 +64,9 @@ class FeedUnitTests < Test::Unit::TestCase
         url = 'test/data/original'
         a.create url
         assert a.cached?(url)
-        stored = Nokogiri::XML(a.recall(url, -1))
+        recalled = a.recall(url, -1)
+        stored = Nokogiri::XML(recalled[:items])
+        assert_equal 8, recalled[:idx]
         assert_equal 8, stored.xpath('//item').length
     end
 
@@ -115,17 +119,21 @@ class LargeFeedUnitTests < Test::Unit::TestCase
 
     def test_limited_recall
         Array(1..101).each do |i|
-            stored = Nokogiri::XML(@arc.recall(@url, i)).xpath('//item')
+            recalled = @arc.recall(@url, i)
+            stored = Nokogiri::XML(recalled[:items]).xpath('//item')
             assert_equal min(i, 25), stored.length
             assert_equal i, Integer(stored[-1].at('guid').content[3..-1])
+            assert_equal i, recalled[:idx]
         end
     end
 
     def test_recall_past_end
         [102, 103, 104, 124, 125, 126, 149, 150, 151, 152].each do |i|
-            stored = Nokogiri::XML(@arc.recall(@url, i)).xpath('//item')
+            recalled = @arc.recall(@url, i)
+            stored = Nokogiri::XML(recalled[:items]).xpath('//item')
             assert_equal 25, stored.length
             assert_equal 101, Integer(stored[-1].at('guid').content[3..-1])
+            assert_equal 101, recalled[:idx]
         end
     end
 end

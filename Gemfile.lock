@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rerun (0.1.0)
+    rerun (0.1.1)
       aws-sdk
       nokogiri
       pg

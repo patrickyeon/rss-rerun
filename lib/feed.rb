@@ -25,7 +25,7 @@ class Feed
         items = feed.xpath('//item')
         items.each {|item| item.remove}
 
-        recent_items = Nokogiri::XML(@arc.recall(url, -1)).xpath('//item')
+        recent_items = Nokogiri::XML(@arc.recall(url, -1)[:items]).xpath('//item')
         recent_guid = recent_items[-1].at('guid').content
         new_guids = items.collect {|item| item.at('guid').content}
         cutoff = new_guids.index(recent_guid)
@@ -128,7 +128,8 @@ class Archive
             items = Nokogiri::XML('<x>%s</x>' % items).xpath('//item')
             items = items[loc % 25, 25]
         end
-        return '<items>%s</items>' % items.to_xml
+        return {:items => '<items>%s</items>' % items.to_xml,
+                :idx => loc}
     end
 
     def create(url)

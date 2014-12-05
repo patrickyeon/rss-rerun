@@ -29,14 +29,23 @@ class Rerun
             end
             repubDate += 1
         end
+        # dates now has all the repubdates, in chronological order
 
-        items = Nokogiri::XML(@feed.recall(dates.length)).xpath('//item').reverse
+        recalled = @feed.recall(dates.length)
+        items = Nokogiri::XML(recalled[:items]).xpath('//item').reverse
+        # reject any repub dates that we wouldn't even reach
+        dates = dates[0..recalled[:idx]]
         items.zip(dates.reverse) do |item, date|
+            # going through (item, date) pairs in reverse chronological order
             unless date == nil
                 if item.at('pubDate') != nil
+                    pubDate = item.at('pubDate').to_str
+                    if DateTime.parse(pubDate) > date
+                        next
+                    end
                     odate = Nokogiri::XML::Node.new('rerun:origDate', @feed.chan)
                     # TODO should this be .content instead?
-                    odate.content = item.at('pubDate').to_str
+                    odate.content = pubDate
                     item.add_child(odate)
                     if item.at('description') != nil
                         # add a "originally published on" date to the description

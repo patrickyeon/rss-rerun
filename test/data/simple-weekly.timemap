@@ -1,0 +1,2 @@
+<test/data/simple-weekly.timemap>; rel="self"; type="application/link-format"; from="Sat, 5 Apr 2014 14:00:00 +0000"; until="Sat, 5 Apr 2014 14:00:00 +0000",
+<test/data/simple-weekly.rss>; rel="last memento"; datetime="Sat, 5 Apr 2014 14:00:00 +0000"
